@@ -7,9 +7,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Type;
 
 class Card {
     int GlDM;
@@ -21,6 +28,7 @@ class Card {
     String type;
     String status;
     String imagePath; // Path to the image
+    int count;
 
     public Card(String name, int damage, int heal, int energycard, String type, int GlDM, int EGlDM, String status, String imagePath) {
         this.name = name;
@@ -32,6 +40,7 @@ class Card {
         this.EGlDM = EGlDM;
         this.status = status;
         this.imagePath = imagePath;
+        this.count = count;
     }
 }
 
@@ -46,13 +55,23 @@ class Player {
         this.energy = Gl.energyglobal;
         this.deck = new ArrayList<>();
         this.hand = new ArrayList<>();
-        for (int i = 0; i < Gl.DeckExampel; i++) {
-            //  deck.add(new Card("Удар", 5, 0, 1, "attack", 0, 0, "", "/CardPart/resources/ComfyUI_01355_.png"));
-            deck.add(new Card("Перевязка", 0, 2, 1, "heal", 0, 0, "", "/CardPart/resources/jar of pills.png"));
-            deck.add(new Card("flamethrower", 15, 0, 2, "attack", 0, 0, "", "/CardPart/resources/flamethrower .png"));
-            deck.add(new Card("regen crazy", 0, 6, 1, "heal", 0, 0, "insanity", "/CardPart/resources/insanity card1.png"));
-            //    deck.add(new Card("заточка посоха и меча +1", 0, 0, 2, "attack", 1, 0, "", "/CardPart/resources/sharpen.png"));
-            //deck.add(new Card("опасная перевязка", 0, 10, 0, "heal", 0, 1, "infect", "/CardPart/resources/dangerous_bandage.png"));
+        loadCardsFromJson();
+    }
+
+    private void loadCardsFromJson() {
+        Gson gson = new Gson();
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("CardPart/cards.json");
+             InputStreamReader reader = new InputStreamReader(inputStream)){
+            Type listType = new TypeToken<ArrayList<Card>>() {}.getType();
+            List<Card> cards = gson.fromJson(reader, listType);
+            for (Card card : cards) {
+                int count = card.count; // Get the count of the card
+                for (int i = 0; i < count; i++) {
+                    deck.add(card);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -84,7 +103,6 @@ class Player {
         }
     }
 }
-
 class BackgroundPanel extends JPanel {
     private Image backgroundImage;
 
