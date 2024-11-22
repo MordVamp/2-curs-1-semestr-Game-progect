@@ -1,0 +1,47 @@
+Index: src/CardPart/CardPart.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/CardPart/CardPart.java b/src/CardPart/CardPart.java
+--- a/src/CardPart/CardPart.java	
++++ b/src/CardPart/CardPart.java	(date 1731859914781)
+@@ -91,13 +91,7 @@
+     }
+ }
+ 
+-class Monster {
+-    int hp;
+ 
+-    public Monster() {
+-        this.hp = 30;
+-    }
+-}
+ 
+ class BackgroundPanel extends JPanel {
+     private Image backgroundImage;
+@@ -125,7 +119,7 @@
+ 
+     public CardPart() {
+         player = new Player();
+-        monster = new Monster();
++        monster = new RandomMonster();
+ 
+         setTitle("Simple Card Game");
+         setSize(1280, 720);
+@@ -138,13 +132,13 @@
+         endturn = new JButton("End Turn");
+         endturn.addActionListener(this);
+         cardPanel = new JPanel(new GridLayout(1, 0)); // Use GridLayout
+-        cardPanel.setBackground(new Color(0, 0, 0, 0)); // Устанавливаем прозрачный фон
++        //cardPanel.setBackground(new Color(0, 0, 0, 0)); // Устанавливаем прозрачный фон
+         JPanel topPanel = new JPanel(new FlowLayout());
+         topPanel.add(playerEnergy);
+         topPanel.add(playerInfo);
+         topPanel.add(monsterInfo);
+         topPanel.add(endturn);
+-        topPanel.setBackground(new Color(0, 0, 0, 0)); // Устанавливаем прозрачный фон
++        //topPanel.setBackground(new Color(0, 0, 0, 0)); // Устанавливаем прозрачный фон
+         BackgroundPanel backgroundPanel = new BackgroundPanel("/CardPart/resources/Fon.png");
+         backgroundPanel.setLayout(new BorderLayout());
+         backgroundPanel.add(topPanel, BorderLayout.NORTH);

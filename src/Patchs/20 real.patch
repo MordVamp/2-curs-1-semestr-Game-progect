@@ -1,0 +1,191 @@
+Index: src/CardPart/CardPart.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/CardPart/CardPart.java b/src/CardPart/CardPart.java
+--- a/src/CardPart/CardPart.java	
++++ b/src/CardPart/CardPart.java	(date 1732135436857)
+@@ -42,15 +42,15 @@
+     List<Card> hand;
+ 
+     public Player() {
+-        this.hp = 900;
++        this.hp = 19;
+         this.energy = Gl.energyglobal;
+         this.deck = new ArrayList<>();
+         this.hand = new ArrayList<>();
+         for (int i = 0; i < Gl.DeckExampel; i++) {
+             //  deck.add(new Card("Удар", 5, 0, 1, "attack", 0, 0, "", "/CardPart/resources/ComfyUI_01355_.png"));
+-            deck.add(new Card("Перевязка", 0, 10, 1, "heal", 0, 0, "", "/CardPart/resources/bandage.png"));
++            deck.add(new Card("Перевязка", 0, 2, 1, "heal", 0, 0, "", "/CardPart/resources/jar of pills.png"));
+             deck.add(new Card("flamethrower", 15, 0, 2, "attack", 0, 0, "", "/CardPart/resources/flamethrower .png"));
+-            deck.add(new Card("regen crazy", 15, 0, 2, "heal", 0, 0, "insanity", "/CardPart/resources/insanity card1.png"));
++            deck.add(new Card("regen crazy", 0, 6, 1, "heal", 0, 0, "insanity", "/CardPart/resources/insanity card1.png"));
+             //    deck.add(new Card("заточка посоха и меча +1", 0, 0, 2, "attack", 1, 0, "", "/CardPart/resources/sharpen.png"));
+             //deck.add(new Card("опасная перевязка", 0, 10, 0, "heal", 0, 1, "infect", "/CardPart/resources/dangerous_bandage.png"));
+         }
+@@ -74,7 +74,7 @@
+             Gl.GlDM += card.GlDM;
+             if (card.status.equals(""))
+             {}// optimization
+-             else if (card.status.equals("infect")) {
++            else if (card.status.equals("infect")) {
+                 Gl.infect = Gl.infect + 3;
+                 Gl.Nstatus++;
+             } else if (card.status.equals("insanity")) {
+@@ -147,6 +147,9 @@
+     private JLabel monsterActionIcon; // New label for monster action
+ 
+     private JButton endturn;private JPanel cardPanel; private Random random = new Random();
++    private JButton pentagramButton;
++    private JPanel actionPanel;
++    private boolean actionsVisible = false;
+ 
+     public CardPart() {
+         player = new Player();
+@@ -166,9 +169,11 @@
+         ImageIcon hpIcon = new ImageIcon(hpImage);
+         ImageIcon energyIcon = new ImageIcon(energyImage);
+ 
+-        playerInfo = createIconLabel(hpIcon, String.valueOf(player.hp));
+-        playerEnergy = createIconLabel(energyIcon, String.valueOf(player.energy));
++        //playerInfo = createIconLabel(hpIcon, String.valueOf(player.hp));
+         monsterInfo = new JLabel("Monster HP: " + monster.hp);
++        //playerEnergy = createIconLabel(energyIcon, String.valueOf(player.energy));
++        playerInfo = new JLabel(hpIcon);
++        playerEnergy  = new JLabel(energyIcon);
+         monsterActionIcon = new JLabel();
+         endturn = new JButton("End Turn");
+         endturn.addActionListener(this);
+@@ -210,11 +215,71 @@
+         mouseTrackerPanel.setOpaque(false);
+         backgroundPanel.add(mouseTrackerPanel, BorderLayout.CENTER);
+ 
++        // Add pentagram button
++        ImageIcon pentagramIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/BloodRitual/BloodRitual.png"));
++        Image pentagramImg = pentagramIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
++        pentagramButton = new JButton(new ImageIcon(pentagramImg));
++        pentagramButton.setPreferredSize(new Dimension(50, 50));
++        pentagramButton.setContentAreaFilled(false);
++        pentagramButton.setBorderPainted(false);
++        pentagramButton.addActionListener(new ActionListener() {
++            @Override
++            public void actionPerformed(ActionEvent e) {
++                toggleActions();
++            }
++        });
++        topPanel.add(pentagramButton, BorderLayout.WEST);
++
++        // Add action panel
++        actionPanel = new JPanel(new GridLayout(0, 1));
++        actionPanel.setOpaque(false);
++        backgroundPanel.add(actionPanel, BorderLayout.WEST);
++
+         add(backgroundPanel);
+         player.drawCard();
+         updateDisplay();
+     }
+ 
++    private void toggleActions() {
++        if (actionsVisible) {
++            actionPanel.removeAll();
++            actionsVisible = false;
++        } else {
++            // Add action buttons
++            addActionButton("/CardPart/resources/HUD/BloodRitual/mediumattacksacrifice.png", "Action 1", new ActionListener() {
++                @Override
++                public void actionPerformed(ActionEvent e) {
++                    player.hp -= 1;
++                    monster.hp -= 3;
++                    updateDisplay();
++                }
++            });
++            addActionButton("/CardPart/resources/HUD/BloodRitual/mediumattacksacrifice.png", "Action 2", new ActionListener() {
++                @Override
++                public void actionPerformed(ActionEvent e) {
++                    player.hp -= 3;
++                    monster.hp -= 6;
++                    updateDisplay();
++                }
++            });
++            actionsVisible = true;
++        }
++        actionPanel.revalidate();
++        actionPanel.repaint();
++    }
++
++    private void addActionButton(String imagePath, String tooltip, ActionListener listener) {
++        ImageIcon actionIcon = new ImageIcon(getClass().getResource(imagePath));
++        Image actionImg = actionIcon.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
++        JButton actionButton = new JButton(new ImageIcon(actionImg));
++        actionButton.setPreferredSize(new Dimension(70, 70));
++        actionButton.setContentAreaFilled(false);
++        actionButton.setBorderPainted(false);
++        actionButton.setToolTipText(tooltip);
++        actionButton.addActionListener(listener);
++        actionPanel.add(actionButton);
++    }
++
+     @Override
+     public void actionPerformed(ActionEvent e) {
+         if (e.getSource() == endturn) {
+@@ -235,14 +300,26 @@
+     }
+ 
+     private void updateDisplay() {
+-        ImageIcon originalHpIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart.png"));
+-        ImageIcon originalEnergyIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart.png"));
+-
+-        Image hpImage = originalHpIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+-        Image energyImage = originalEnergyIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
++        if (player.hp>9&&player.hp<20) { ImageIcon originalHpIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart/Heart"+player.hp+".png"));
++            Image hpImage = originalHpIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
++            playerInfo.setIcon(new ImageIcon(hpImage));}
++        else {ImageIcon originalHpIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart"+".png"));
++            Image hpImage = originalHpIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
++            playerInfo.setIcon(new ImageIcon(hpImage));};
++
++        //ImageIcon originalEnergyIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart/Heart"+player.energy+".png"));
++        if (player.energy>0&&player.energy<4)  {
++            ImageIcon originalEnergyIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Stamina/Stamina"+player.energy+".png"));
++            Image hpImage = originalEnergyIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
++            playerEnergy.setIcon(new ImageIcon(hpImage));}
++        else { ImageIcon originalEnergyIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Stamina"+".png"));
++
++            Image energyImage = originalEnergyIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+ 
+-        playerInfo.setIcon(createIconLabel(new ImageIcon(hpImage), String.valueOf(player.hp)).getIcon());
+-        playerEnergy.setIcon(createIconLabel(new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Stamina.png")), String.valueOf(player.energy)).getIcon());
++            //playerEnergy.setIcon(createIconLabel(new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Stamina.png")), String.valueOf(player.energy)).getIcon());
++            playerEnergy.setIcon(new ImageIcon(energyImage));
++        };
++
+         monsterInfo.setText("Monster HP: " + monster.hp);
+         cardPanel.removeAll();
+ 
+@@ -272,15 +349,15 @@
+         cardPanel.repaint();
+     }
+ 
+-    private JLabel createIconLabel(ImageIcon icon, String text) {
+-        JLabel label = new JLabel(icon);
+-        label.setHorizontalTextPosition(JLabel.CENTER);
+-        label.setVerticalTextPosition(JLabel.CENTER);
+-        label.setText(text);
+-        label.setForeground(Color.WHITE);
+-        label.setFont(new Font("Arial", Font.BOLD, 20));
+-        return label;
+-    }
++//    private JLabel createIconLabel(ImageIcon icon, String text) {
++//        JLabel label = new JLabel(icon);
++//        label.setHorizontalTextPosition(JLabel.CENTER);
++//        label.setVerticalTextPosition(JLabel.CENTER);
++//        label.setText(text);
++//        label.setForeground(Color.WHITE);
++//        label.setFont(new Font("Arial", Font.BOLD, 20));
++//        return label;
++//    }
+ 
+     private class CardActionListener implements ActionListener {
+         private final Card card;

@@ -1,0 +1,152 @@
+Index: src/CardPart/CardPart.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/CardPart/CardPart.java b/src/CardPart/CardPart.java
+--- a/src/CardPart/CardPart.java	
++++ b/src/CardPart/CardPart.java	(date 1731859914781)
+@@ -13,7 +13,7 @@
+     static int GlDW = 3; // number of draw card
+     static int GlDM = 0; // player modifer of damage
+     static int EGlDM = 0; // enemy modifer of damage
+-    static int DeckExampel = 3; // simple modifer of deck
++    static int DeckExampel = 7; // simple modifer of deck
+     static boolean poison = false;
+     static int infect = 0;
+     static int Nstatus;
+@@ -51,21 +51,21 @@
+     List<Card> hand;
+ 
+     public Player() {
+-        this.hp = 50;
++        this.hp = 1000;
+         this.energy = 3;
+         this.deck = new ArrayList<>();
+         this.hand = new ArrayList<>();
+         for (int i = 0; i < Gl.DeckExampel; i++) {
+             //  deck.add(new Card("Удар", 5, 0, 1, "attack", 0, 0, "", "/CardPart/resources/ComfyUI_01355_.png"));
+-            //   deck.add(new Card("Перевязка", 0, 10, 1, "heal", 0, 0, "", "/CardPart/resources/bandage.png"));
+-              deck.add(new Card("Fireball", 15, 0, 2, "attack", 0, 0, "", "/CardPart/resources/fireball.png"));
++            deck.add(new Card("Перевязка", 0, 10, 1, "heal", 0, 0, "", "/CardPart/resources/bandage.png"));
++            deck.add(new Card("Fireball", 15, 0, 2, "attack", 0, 0, "", "/CardPart/resources/fireball.png"));
+             //    deck.add(new Card("заточка посоха и меча +1", 0, 0, 2, "attack", 1, 0, "", "/CardPart/resources/sharpen.png"));
+             //deck.add(new Card("опасная перевязка", 0, 10, 0, "heal", 0, 1, "infect", "/CardPart/resources/dangerous_bandage.png"));
+         }
+     }
+ 
+     public void drawCard() {
+-        if (!deck.isEmpty()) {
++        if (!deck.isEmpty() && hand.size() < 8) {
+             Random rand = new Random();
+             Card card = deck.remove(rand.nextInt(deck.size()));
+             hand.add(card);
+@@ -99,6 +99,20 @@
+     }
+ }
+ 
++class BackgroundPanel extends JPanel {
++    private Image backgroundImage;
++
++    public BackgroundPanel(String imagePath) {
++        backgroundImage = new ImageIcon(getClass().getResource(imagePath)).getImage();
++    }
++
++    @Override
++    protected void paintComponent(Graphics g) {
++        super.paintComponent(g);
++        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
++    }
++}
++
+ public class CardPart extends JFrame implements ActionListener {
+     private Player player;
+     private Monster monster;
+@@ -107,27 +121,38 @@
+     private JLabel monsterInfo;
+     private JButton endturn;
+     private JPanel cardPanel;
++    private Random random = new Random();
+ 
+     public CardPart() {
+         player = new Player();
+         monster = new Monster();
+ 
+         setTitle("Simple Card Game");
+-        setSize(1280 , 720 );
++        setSize(1280, 720);
+         setDefaultCloseOperation(EXIT_ON_CLOSE);
+-        setLayout(new FlowLayout());
++        setLayout(new BorderLayout());
+ 
+         playerInfo = new JLabel("Player HP: " + player.hp);
+         playerEnergy = new JLabel("Player Energy: " + player.energy);
+         monsterInfo = new JLabel("Monster HP: " + monster.hp);
+         endturn = new JButton("End Turn");
+         endturn.addActionListener(this);
+-        cardPanel = new JPanel();
+-        add(playerEnergy);
+-        add(playerInfo);
+-        add(monsterInfo);
+-        add(endturn);
+-        add(cardPanel);
++        cardPanel = new JPanel(new GridLayout(1, 0)); // Use GridLayout
++        cardPanel.setBackground(new Color(0, 0, 0, 0)); // Устанавливаем прозрачный фон
++        JPanel topPanel = new JPanel(new FlowLayout());
++        topPanel.add(playerEnergy);
++        topPanel.add(playerInfo);
++        topPanel.add(monsterInfo);
++        topPanel.add(endturn);
++        topPanel.setBackground(new Color(0, 0, 0, 0)); // Устанавливаем прозрачный фон
++        BackgroundPanel backgroundPanel = new BackgroundPanel("/CardPart/resources/Fon.png");
++        backgroundPanel.setLayout(new BorderLayout());
++        backgroundPanel.add(topPanel, BorderLayout.NORTH);
++        backgroundPanel.add(cardPanel, BorderLayout.SOUTH);
++
++        add(backgroundPanel);
++
++        updateDisplay(); // Initial display update
+     }
+ 
+     @Override
+@@ -143,6 +168,7 @@
+             player.energy = Gl.energyglobal;
+             monsterAttack();
+             updateDisplay();
++            // applyInsanityMechanic();
+         }
+     }
+ 
+@@ -158,9 +184,11 @@
+             Image scaledImg = img.getScaledInstance(240, 240, Image.SCALE_SMOOTH);
+             ImageIcon scaledIcon = new ImageIcon(scaledImg);
+             JButton cardButton = new JButton(scaledIcon);
++            cardButton.setPreferredSize(new Dimension(240, 240)); // Set preferred size
++            cardButton.setBorderPainted(false); // Remove border
++            cardButton.setContentAreaFilled(false); // Remove content area
+             cardButton.addActionListener(new CardActionListener(card));
+             cardPanel.add(cardButton);
+-
+         }
+ 
+         if (player.hp <= 0) {
+@@ -194,6 +222,19 @@
+         }
+     }
+ 
++    private void applyInsanityMechanic() {
++        for (Card card : player.hand) {
++            if (random.nextBoolean() && !card.name.equals("Fireball")) { // Example exception
++                String[] possibleImages = {
++                        "/CardPart/resources/insanity1.png",
++                        "/CardPart/resources/insanity2.png",
++                        "/CardPart/resources/insanity3.png"
++                };
++                card.imagePath = possibleImages[random.nextInt(possibleImages.length)];
++            }
++        }
++    }
++
+     public static void main(String args[]) {
+         SwingUtilities.invokeLater(() -> {
+             CardPart game = new CardPart();

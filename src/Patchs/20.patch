@@ -1,0 +1,20 @@
+Index: src/CardPart/CardPart.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/CardPart/CardPart.java b/src/CardPart/CardPart.java
+--- a/src/CardPart/CardPart.java	
++++ b/src/CardPart/CardPart.java	(date 1732135436857)
+@@ -270,9 +270,9 @@
+ 
+     private void addActionButton(String imagePath, String tooltip, ActionListener listener) {
+         ImageIcon actionIcon = new ImageIcon(getClass().getResource(imagePath));
+-        Image actionImg = actionIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
++        Image actionImg = actionIcon.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
+         JButton actionButton = new JButton(new ImageIcon(actionImg));
+-        actionButton.setPreferredSize(new Dimension(150, 150));
++        actionButton.setPreferredSize(new Dimension(70, 70));
+         actionButton.setContentAreaFilled(false);
+         actionButton.setBorderPainted(false);
+         actionButton.setToolTipText(tooltip);

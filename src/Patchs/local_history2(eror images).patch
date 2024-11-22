@@ -1,0 +1,17 @@
+Index: src/CardPart/CardPart.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/CardPart/CardPart.java b/src/CardPart/CardPart.java
+--- a/src/CardPart/CardPart.java	
++++ b/src/CardPart/CardPart.java	(date 1731784812378)
+@@ -223,7 +223,7 @@
+             GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+             GraphicsDevice device = env.getDefaultScreenDevice();
+             device.setFullScreenWindow(game);
+-            device.setDisplayMode(new DisplayMode(1920, 1080, 32, DisplayMode.REFRESH_RATE_UNKNOWN));
++            //device.setDisplayMode(new DisplayMode(1920, 1080, 32, DisplayMode.REFRESH_RATE_UNKNOWN));
+         });
+     }
+ }

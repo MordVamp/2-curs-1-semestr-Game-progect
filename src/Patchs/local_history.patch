@@ -1,0 +1,119 @@
+Index: src/CardPart/CardPart.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/CardPart/CardPart.java b/src/CardPart/CardPart.java
+--- a/src/CardPart/CardPart.java	
++++ b/src/CardPart/CardPart.java	(date 1731784812378)
+@@ -57,7 +57,7 @@
+         this.hand = new ArrayList<>();
+         for (int i = 0; i < Gl.DeckExampel; i++) {
+             //  deck.add(new Card("Удар", 5, 0, 1, "attack", 0, 0, "", "/CardPart/resources/ComfyUI_01355_.png"));
+-               deck.add(new Card("Перевязка", 0, 10, 1, "heal", 0, 0, "", "/CardPart/resources/bandage.png"));
++            //   deck.add(new Card("Перевязка", 0, 10, 1, "heal", 0, 0, "", "/CardPart/resources/bandage.png"));
+             deck.add(new Card("Fireball", 15, 0, 2, "attack", 0, 0, "", "/CardPart/resources/fireball.png"));
+             //    deck.add(new Card("заточка посоха и меча +1", 0, 0, 2, "attack", 1, 0, "", "/CardPart/resources/sharpen.png"));
+             //deck.add(new Card("опасная перевязка", 0, 10, 0, "heal", 0, 1, "infect", "/CardPart/resources/dangerous_bandage.png"));
+@@ -65,7 +65,7 @@
+     }
+ 
+     public void drawCard() {
+-        if (!deck.isEmpty()) {
++        if (!deck.isEmpty() && hand.size() < 7) {
+             Random rand = new Random();
+             Card card = deck.remove(rand.nextInt(deck.size()));
+             hand.add(card);
+@@ -109,15 +109,27 @@
+     private JPanel cardPanel;
+     private Random random = new Random();
+ 
++    private final String[] insanityImages = {
++            "/CardPart/resources/insanity1.png",
++            "/CardPart/resources/insanity2.png",
++            "/CardPart/resources/insanity3.png"
++    };
++
+     public CardPart() {
+         player = new Player();
+         monster = new Monster();
+-
+-        setTitle("Simple Card Game");
+-        setSize(1280 , 720 );
++        setSize(1280, 720);
++        setTitle("Simple Card Game");
++        setUndecorated(true);
++        setExtendedState(JFrame.MAXIMIZED_BOTH);
+         setDefaultCloseOperation(EXIT_ON_CLOSE);
+         setLayout(new BorderLayout());
+ 
++        // Set background image
++        JLabel background = new JLabel(new ImageIcon(getClass().getResource("/CardPart/resources/Fon.png")));
++        background.setLayout(new BorderLayout());
++        add(background);
++
+         playerInfo = new JLabel("Player HP: " + player.hp);
+         playerEnergy = new JLabel("Player Energy: " + player.energy);
+         monsterInfo = new JLabel("Monster HP: " + monster.hp);
+@@ -131,8 +143,8 @@
+         topPanel.add(monsterInfo);
+         topPanel.add(endturn);
+ 
+-        add(topPanel, BorderLayout.NORTH);
+-        add(cardPanel, BorderLayout.SOUTH);
++        background.add(topPanel, BorderLayout.NORTH);
++        background.add(cardPanel, BorderLayout.SOUTH);
+     }
+ 
+     @Override
+@@ -148,7 +160,6 @@
+             player.energy = Gl.energyglobal;
+             monsterAttack();
+             updateDisplay();
+-            applyInsanityMechanic();
+         }
+     }
+ 
+@@ -159,7 +170,11 @@
+         cardPanel.removeAll();
+ 
+         for (Card card : player.hand) {
+-            ImageIcon originalIcon = new ImageIcon(getClass().getResource(card.imagePath));
++            String imagePath = card.imagePath;
++            if (random.nextBoolean()) { // 50% chance to replace the image
++                imagePath = insanityImages[random.nextInt(insanityImages.length)];
++            }
++            ImageIcon originalIcon = new ImageIcon(getClass().getResource(imagePath));
+             Image img = originalIcon.getImage();
+             Image scaledImg = img.getScaledInstance(240, 240, Image.SCALE_SMOOTH);
+             ImageIcon scaledIcon = new ImageIcon(scaledImg);
+@@ -199,23 +214,16 @@
+         }
+     }
+ 
+-    private void applyInsanityMechanic() {
+-        for (Card card : player.hand) {
+-            if (random.nextBoolean() && !card.name.equals("Fireball")) { // Example exception
+-                String[] possibleImages = {
+-                        "/CardPart/resources/random_image1.png",
+-                        "/CardPart/resources/random_image2.png",
+-                        "/CardPart/resources/random_image3.png"
+-                };
+-                card.imagePath = possibleImages[random.nextInt(possibleImages.length)];
+-            }
+-        }
+-    }
+-
+     public static void main(String args[]) {
+         SwingUtilities.invokeLater(() -> {
+             CardPart game = new CardPart();
+             game.setVisible(true);
++
++            // Set fullscreen mode
++            GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
++            GraphicsDevice device = env.getDefaultScreenDevice();
++            device.setFullScreenWindow(game);
++            //device.setDisplayMode(new DisplayMode(1920, 1080, 32, DisplayMode.REFRESH_RATE_UNKNOWN));
+         });
+     }
+ }

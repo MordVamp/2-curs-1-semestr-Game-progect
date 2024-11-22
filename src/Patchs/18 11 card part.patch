@@ -1,0 +1,166 @@
+Index: src/CardPart/CardPart.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/CardPart/CardPart.java b/src/CardPart/CardPart.java
+--- a/src/CardPart/CardPart.java	
++++ b/src/CardPart/CardPart.java	(date 1731941536616)
+@@ -8,16 +8,7 @@
+ import java.util.List;
+ import java.util.Random;
+ 
+-class Gl { // global variety for increse or less modifer of damga or other
+-    static int energyglobal = 3; // player energy
+-    static int GlDW = 3; // number of draw card
+-    static int GlDM = 0; // player modifer of damage
+-    static int EGlDM = 0; // enemy modifer of damage
+-    static int DeckExampel = 7; // simple modifer of deck
+-    static boolean poison = false;
+-    static int infect = 0;
+-    static int Nstatus;
+-}
++
+ 
+ class Card {
+     int GlDM;
+@@ -58,7 +49,8 @@
+         for (int i = 0; i < Gl.DeckExampel; i++) {
+             //  deck.add(new Card("Удар", 5, 0, 1, "attack", 0, 0, "", "/CardPart/resources/ComfyUI_01355_.png"));
+             deck.add(new Card("Перевязка", 0, 10, 1, "heal", 0, 0, "", "/CardPart/resources/bandage.png"));
+-            deck.add(new Card("Fireball", 15, 0, 2, "attack", 0, 0, "", "/CardPart/resources/fireball.png"));
++            deck.add(new Card("flamethrower", 15, 0, 2, "attack", 0, 0, "", "/CardPart/resources/flamethrower .png"));
++            deck.add(new Card("regen crazy", 15, 0, 2, "heal", 0, 0, "insanity", "/CardPart/resources/insanity card1.png"));
+             //    deck.add(new Card("заточка посоха и меча +1", 0, 0, 2, "attack", 1, 0, "", "/CardPart/resources/sharpen.png"));
+             //deck.add(new Card("опасная перевязка", 0, 10, 0, "heal", 0, 1, "infect", "/CardPart/resources/dangerous_bandage.png"));
+         }
+@@ -80,12 +72,15 @@
+             }
+             hp += card.heal;
+             Gl.GlDM += card.GlDM;
+-            if (card.status.equals("")) {
+-                // No status effect
+-            } else if (card.status.equals("infect")) {
++            if (card.status.equals(""))
++            {}// optimization
++             else if (card.status.equals("infect")) {
+                 Gl.infect = Gl.infect + 3;
+                 Gl.Nstatus++;
+             }
++            else if (card.status.equals("insanity")) {
++                Gl.insanity = Gl.insanity + 3;
++                Gl.Nstatus++;}
+             hand.remove(card);
+         }
+     }
+@@ -107,22 +102,23 @@
+     }
+ }
+ 
++
++
+ public class CardPart extends JFrame implements ActionListener {
+-    private Player player;
+-    private Monster monster;
+-    private JLabel playerEnergy;
+-    private JLabel playerInfo;
+-    private JLabel monsterInfo;
++    private Player player;private JLabel playerEnergy;private JLabel playerInfo;
++    private Monster monster;private JPanel monsterPanel;  private JLabel monsterInfo;
+     private JButton endturn;
+     private JPanel cardPanel;
++
++
+     private Random random = new Random();
+ 
+     public CardPart() {
+         player = new Player();
+         monster = new RandomMonster();
+ 
+-        setTitle("Simple Card Game");
+-        setSize(1280, 720);
++        setTitle("Lafcraft Card Game");
++        setSize(1920, 1080);
+         setDefaultCloseOperation(EXIT_ON_CLOSE);
+         setLayout(new BorderLayout());
+ 
+@@ -132,17 +128,33 @@
+         endturn = new JButton("End Turn");
+         endturn.addActionListener(this);
+         cardPanel = new JPanel(new GridLayout(1, 0)); // Use GridLayout
+-        //cardPanel.setBackground(new Color(0, 0, 0, 0)); // Устанавливаем прозрачный фон
++        monsterPanel = new JPanel(new BorderLayout()); // Новая панель для монстра
++        monsterPanel.setOpaque(false);
++        monsterPanel.setOpaque(false);
++        // Добавляем изображение монстра
++        ImageIcon monsterIcon = new ImageIcon(getClass().getResource(monster.miPath));
++        Image img = monsterIcon.getImage();
++        Image scaledImg = img.getScaledInstance(240, 240, Image.SCALE_SMOOTH);
++        ImageIcon scaledMonsterIcon = new ImageIcon(scaledImg);
++        JLabel monsterImageLabel = new JLabel(scaledMonsterIcon);
++        monsterPanel.add(monsterImageLabel, BorderLayout.CENTER);
++
++        // Добавляем информацию о монстре
++        JPanel monsterInfoPanel = new JPanel(new FlowLayout());
++        monsterInfoPanel.add(monsterInfo);
++        monsterPanel.add(monsterInfoPanel, BorderLayout.SOUTH);
++        cardPanel.setOpaque(false);
+         JPanel topPanel = new JPanel(new FlowLayout());
++        topPanel.setOpaque(false);
+         topPanel.add(playerEnergy);
+         topPanel.add(playerInfo);
+-        topPanel.add(monsterInfo);
+         topPanel.add(endturn);
+-        //topPanel.setBackground(new Color(0, 0, 0, 0)); // Устанавливаем прозрачный фон
++
+         BackgroundPanel backgroundPanel = new BackgroundPanel("/CardPart/resources/Fon.png");
+         backgroundPanel.setLayout(new BorderLayout());
+         backgroundPanel.add(topPanel, BorderLayout.NORTH);
+         backgroundPanel.add(cardPanel, BorderLayout.SOUTH);
++        backgroundPanel.add(monsterPanel, BorderLayout.EAST); // Добавляем панель монстра справа
+ 
+         add(backgroundPanel);
+ 
+@@ -162,7 +174,8 @@
+             player.energy = Gl.energyglobal;
+             monsterAttack();
+             updateDisplay();
+-            // applyInsanityMechanic();
++             if (Gl.insanity > 0){applyInsanityMechanic();}
++
+         }
+     }
+ 
+@@ -185,17 +198,11 @@
+             cardPanel.add(cardButton);
+         }
+ 
+-        if (player.hp <= 0) {
+-            JOptionPane.showMessageDialog(this, "You have been defeated!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+-            System.exit(0);
+-        } else if (monster.hp <= 0) {
+-            JOptionPane.showMessageDialog(this, "You defeated the monster!", "Victory!", JOptionPane.INFORMATION_MESSAGE);
+-            System.exit(0);
+-        }
+         cardPanel.revalidate();
+         cardPanel.repaint();
+     }
+ 
++
+     private class CardActionListener implements ActionListener {
+         private final Card card;
+ 
+@@ -212,7 +219,12 @@
+ 
+     private void monsterAttack() {
+         if (monster.hp > 0) {
+-            player.hp -= 15 + Gl.EGlDM; // damage
++            Action action = monster.actions[new Random().nextInt(monster.actions.length)];
++            if (action.getType().equals("attack")) {
++                player.hp -= action.getValue() + Gl.EGlDM; // damage
++            } else if (action.getType().equals("heal")) {
++                monster.hp += action.getValue(); // heal
++            }
+         }
+     }
+ 

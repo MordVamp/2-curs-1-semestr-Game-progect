@@ -1,0 +1,19 @@
+Index: src/CardPart/CardPart.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/CardPart/CardPart.java b/src/CardPart/CardPart.java
+--- a/src/CardPart/CardPart.java	
++++ b/src/CardPart/CardPart.java	(date 1731786057541)
+@@ -165,8 +165,8 @@
+             JButton cardButton = new JButton(scaledIcon);
+            // cardButton.setPreferredSize(new Dimension(240, 240)); // Set preferred size
+             cardButton.setBorderPainted(false); // Remove border
+-           // cardButton.setContentAreaFilled(false); // Remove content area
+-               cardButton.setFocusPainted(false); // Remove focus
++            cardButton.setContentAreaFilled(false); // Remove content area
++            //   cardButton.setFocusPainted(false); // Remove focus
+             cardButton.addActionListener(new CardActionListener(card));
+             cardPanel.add(cardButton);
+         }

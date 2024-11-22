@@ -1,0 +1,53 @@
+Index: src/CardPart/CardPart.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/CardPart/CardPart.java b/src/CardPart/CardPart.java
+--- a/src/CardPart/CardPart.java	
++++ b/src/CardPart/CardPart.java	(date 1731791955589)
+@@ -121,15 +121,19 @@
+         setLayout(new BorderLayout());
+ 
+         playerInfo = new JLabel("Player HP: " + player.hp);
++        playerInfo.setFont(new Font("Arial", Font.BOLD, 20));
++        //       playerInfo. setBackground(Color.LIGHT_GRAY); // Установка цвета фона панели
+         playerEnergy = new JLabel("Player Energy: " + player.energy);
+         monsterInfo = new JLabel("Monster HP: " + monster.hp);
+         endturn = new JButton("End Turn");
+         endturn.addActionListener(this);
+         cardPanel = new JPanel(new GridLayout(1, 0)); // Use GridLayout with 4 columns
+-
++        cardPanel.setBackground(new Color(0, 0, 0, 0)); // Устанавливаем прозрачный фон
+         JPanel topPanel = new JPanel(new FlowLayout());
++        topPanel.setBackground(new Color(0, 0, 0, 0)); // Устанавливаем прозрачный фон
+         topPanel.add(playerEnergy);
+         topPanel.add(playerInfo);
++        playerInfo. setBackground(Color.LIGHT_GRAY); // Установка цвета фона панели
+         topPanel.add(monsterInfo);
+         topPanel.add(endturn);
+ 
+@@ -180,7 +184,7 @@
+ 
+         add(backgroundPanel);
+ 
+-        updateDisplay(); // Initial display update
++      //  updateDisplay(); // Initial display update
+     }
+ 
+     @Override
+@@ -201,9 +205,13 @@
+     }
+ 
+     private void updateDisplay() {
+-        playerInfo.setText("Player HP: " + player.hp);
++
++        playerInfo.setText("Player HP: " + player.hp  );
+         playerEnergy.setText("Player Energy: " + player.energy);
+         monsterInfo.setText("Monster HP: " + monster.hp);
++        //JLabel playerEnergyLabel = new JLabel("<html><div style='font-size: 20px; text-shadow: 2px 2px 4px #000000;'>Player Energy: " + player.energy + "</div></html>");
++       // JLabel monsterInfo = new JLabel("<html><div style='font-size: 20px; text-shadow: 2px 2px 4px #000000;'>Monster HP: " + monster.hp + "</div></html>");
++
+         cardPanel.removeAll();
+ 
+         for (Card card : player.hand) {
