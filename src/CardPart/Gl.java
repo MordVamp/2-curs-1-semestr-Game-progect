@@ -3,6 +3,7 @@ package CardPart;
 import java.util.Random;
 
 public class Gl { // global variety for increse or less modifer of damga or other
+    static int hpGL=1000;
     static int energyglobal = 3; // player energy
     static int GlDW = 3; // number of draw card
     static int GlDM = 0; // player modifer of damage
