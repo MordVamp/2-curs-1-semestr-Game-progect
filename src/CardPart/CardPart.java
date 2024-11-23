@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import com.google.gson.Gson;
+import java.util.Collections; 
 import com.google.gson.reflect.TypeToken;
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,10 +28,11 @@ class Card {
     String name;
     String type;
     String status;
-    String imagePath; // Path to the image
+    String imagePath;
     int count;
+    int addtodis;
 
-    public Card(String name, int damage, int heal, int energycard, String type, int GlDM, int EGlDM, String status, String imagePath) {
+    public Card(String name, int damage, int heal, int energycard, String type, int GlDM, int EGlDM, String status, String imagePath,int addtodis) {
         this.name = name;
         this.type = type;
         this.damage = damage;
@@ -40,7 +42,7 @@ class Card {
         this.EGlDM = EGlDM;
         this.status = status;
         this.imagePath = imagePath;
-        this.count = count;
+        this.addtodis=addtodis;//marks ads card on dis and number of add
     }
 }
 
@@ -49,12 +51,14 @@ class Player {
     int energy;
     List<Card> deck;
     List<Card> hand;
+    List<Card> discardPile;
 
     public Player() {
-        this.hp = 19;
+        this.hp = Gl.hpGL;
         this.energy = Gl.energyglobal;
         this.deck = new ArrayList<>();
         this.hand = new ArrayList<>();
+        this.discardPile = new ArrayList<>();
         loadCardsFromJson();
     }
 
@@ -80,6 +84,8 @@ class Player {
             Random rand = new Random();
             Card card = deck.remove(rand.nextInt(deck.size()));
             hand.add(card);
+        } else if (deck.isEmpty()) {
+            shuffleDiscardPileIntoDeck();
         }
     }
 
@@ -100,9 +106,30 @@ class Player {
                 Gl.insanity = Gl.insanity + 3;
                 Gl.Nstatus++;}
             hand.remove(card);
+
+            int i = 0;
+            while (i <card.addtodis) {
+                discardPile.add(card);
+                i++;
+            }
+
+
         }
     }
+
+    private void shuffleDiscardPileIntoDeck() {
+        deck.addAll(discardPile);
+        discardPile.clear();
+        Collections.shuffle(deck);
+    }
+
+//    public void addFlamethrowerCards() {
+//        for (int i = 0; i < 2; i++) {
+//            deck.add(new Card("Flamethrower", 5, 0, 2, "attack", 0, 0, "", "/CardPart/resources/flamethrower.png"));
+//        }
+//    }
 }
+
 class BackgroundPanel extends JPanel {
     private Image backgroundImage;
 
@@ -143,11 +170,7 @@ class BackgroundPanel extends JPanel {
             int eyeHeight = 200; // Height of the eye image
             g.drawImage(eyeImage, centerX - eyeWidth / 2, centerY - eyeHeight / 2, eyeWidth, eyeHeight, this);
 
-            // Draw the transparent circular area
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-            g2d.setColor(new Color(255, 255, 255, 128)); // Semi-transparent white
-            g2d.fillOval(centerX - circleRadius, centerY - circleRadius, circleRadius * 2, circleRadius * 2);
+
 
             // Draw the red dot within the circular area
             int dotRadius = 5;
@@ -168,6 +191,7 @@ public class CardPart extends JFrame implements ActionListener {
     private JButton pentagramButton;
     private JPanel actionPanel;
     private boolean actionsVisible = false;
+    int battlesWon = Gl.battlesWon;
 
     public CardPart() {
         player = new Player();
@@ -187,11 +211,9 @@ public class CardPart extends JFrame implements ActionListener {
         ImageIcon hpIcon = new ImageIcon(hpImage);
         ImageIcon energyIcon = new ImageIcon(energyImage);
 
-        //playerInfo = createIconLabel(hpIcon, String.valueOf(player.hp));
-        monsterInfo = new JLabel("Monster HP: " + monster.hp);
-        //playerEnergy = createIconLabel(energyIcon, String.valueOf(player.energy));
         playerInfo = new JLabel(hpIcon);
-        playerEnergy  = new JLabel(energyIcon);
+        playerEnergy = new JLabel(energyIcon);
+        monsterInfo = new JLabel("Monster HP: " + monster.hp);
         monsterActionIcon = new JLabel();
         endturn = new JButton("End Turn");
         endturn.addActionListener(this);
@@ -209,7 +231,7 @@ public class CardPart extends JFrame implements ActionListener {
         JPanel monsterInfoPanel = new JPanel(new FlowLayout());
         monsterInfoPanel.add(monsterInfo);
         monsterInfoPanel.add(monsterActionIcon);
-        monsterPanel.add(monsterInfoPanel, BorderLayout.SOUTH);
+        monsterPanel.add(monsterInfoPanel, BorderLayout.NORTH);
         cardPanel.setOpaque(false);
         JPanel topPanel = new JPanel(new FlowLayout());
         topPanel.setOpaque(false);
@@ -224,15 +246,19 @@ public class CardPart extends JFrame implements ActionListener {
 
         BackgroundPanel backgroundPanel = new BackgroundPanel("/CardPart/resources/Fon.png");
         backgroundPanel.setLayout(new BorderLayout());
-        backgroundPanel.add(topPanel, BorderLayout.NORTH);
+        //backgroundPanel.add(topPanel, BorderLayout.NORTH);
         backgroundPanel.add(cardPanel, BorderLayout.SOUTH);
-        backgroundPanel.add(monsterPanel, BorderLayout.EAST);
+       // backgroundPanel.add(monsterPanel, BorderLayout.EAST);
 
         BackgroundPanel.MouseTrackerPanel mouseTrackerPanel = new BackgroundPanel.MouseTrackerPanel();
         mouseTrackerPanel.setPreferredSize(new Dimension(200, 200));
         mouseTrackerPanel.setOpaque(false);
-        backgroundPanel.add(mouseTrackerPanel, BorderLayout.CENTER);
-
+        // Add action panel
+        actionPanel = new JPanel(new GridLayout(0, 1));
+        // actionPanel.setOpaque(true);
+       // actionPanel.add(mouseTrackerPanel, BorderLayout.EAST);
+        actionPanel.setVisible(false);
+        BackgroundPanel actionPanel2 = new BackgroundPanel("/CardPart/resources/Fon.png");
         // Add pentagram button
         ImageIcon pentagramIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/BloodRitual/BloodRitual.png"));
         Image pentagramImg = pentagramIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
@@ -248,45 +274,67 @@ public class CardPart extends JFrame implements ActionListener {
         });
         topPanel.add(pentagramButton, BorderLayout.WEST);
 
-        // Add action panel
-        actionPanel = new JPanel(new GridLayout(0, 1));
-        actionPanel.setOpaque(false);
-        backgroundPanel.add(actionPanel, BorderLayout.WEST);
 
-        add(backgroundPanel);
+
+        // Use JLayeredPane as the main panel
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setPreferredSize(new Dimension(1920, 1080));
+        layeredPane.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
+        layeredPane.add(actionPanel, JLayeredPane.PALETTE_LAYER);
+        layeredPane.add(topPanel, JLayeredPane.PALETTE_LAYER);
+        layeredPane.add(monsterPanel, JLayeredPane.PALETTE_LAYER);
+        // Set bounds for the panels
+        backgroundPanel.setBounds(0, 0, 1920, 1080);
+        actionPanel.setBounds(440, 200, 700, 500); // Adjust the size and position as needed
+        topPanel.setBounds(0, 0, 1920, 200);
+        monsterPanel.setBounds(1600, 400, 200, 400);
+        add(layeredPane);
         player.drawCard();
         updateDisplay();
     }
 
     private void toggleActions() {
-        if (actionsVisible) {
-            actionPanel.removeAll();
-            actionsVisible = false;
-        } else {
-            // Add action buttons
-            addActionButton("/CardPart/resources/HUD/BloodRitual/mediumattacksacrifice.png", "Action 1", new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    player.hp -= 1;
-                    monster.hp -= 3;
-                    updateDisplay();
+            if (actionsVisible) {
+                // Удаляем все кнопки из actionPanel
+                Component[] components = actionPanel.getComponents();
+                for (Component component : components) {
+                    if (component instanceof JButton) {
+                        actionPanel.remove(component);
+                    }
                 }
-            });
-            addActionButton("/CardPart/resources/HUD/BloodRitual/mediumattacksacrifice.png", "Action 2", new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    player.hp -= 3;
-                    monster.hp -= 6;
-                    updateDisplay();
-                }
-            });
-            actionsVisible = true;
+                // Скрываем actionPanel
+                actionPanel.setVisible(false);
+                actionsVisible = false;
+            } else {
+                // Показываем actionPanel
+                actionPanel.setVisible(true);
+                // Добавляем кнопки действий
+                addActionButton("/CardPart/resources/HUD/BloodRitual/mediumattacksacrifice.png", "Action 1", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        player.hp -= 1;
+                        monster.hp -= 3;
+                        updateDisplay();
+                    }
+                });
+                addActionButton("/CardPart/resources/HUD/BloodRitual/mediumattacksacrifice.png", "Action 2", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        player.hp -= 3;
+                        monster.hp -= 6;
+                        updateDisplay();
+                    }
+                });
+                actionsVisible = true;
+            }
+            // Обновляем отображение actionPanel
+            actionPanel.revalidate();
+            actionPanel.repaint();
         }
-        actionPanel.revalidate();
-        actionPanel.repaint();
-    }
 
-    private void addActionButton(String imagePath, String tooltip, ActionListener listener) {
+
+
+        private void addActionButton(String imagePath, String tooltip, ActionListener listener) {
         ImageIcon actionIcon = new ImageIcon(getClass().getResource(imagePath));
         Image actionImg = actionIcon.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
         JButton actionButton = new JButton(new ImageIcon(actionImg));
@@ -297,6 +345,7 @@ public class CardPart extends JFrame implements ActionListener {
         actionButton.addActionListener(listener);
         actionPanel.add(actionButton);
     }
+
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -313,6 +362,18 @@ public class CardPart extends JFrame implements ActionListener {
             updateDisplay();
             if (Gl.insanity > 0) {
                 applyInsanityMechanic();
+            }
+            if (monster.hp <= 0) {
+                battlesWon++;
+                // player.addFlamethrowerCards();
+                if (battlesWon < 3) {
+                    monster = new RandomMonster();
+                    updateDisplay();
+                } else {
+                    monster =new Boss1();
+                    JOptionPane.showMessageDialog(this, "You have won all battles!", "Victory!", JOptionPane.INFORMATION_MESSAGE);
+                    System.exit(0);
+                }
             }
         }
     }
@@ -360,8 +421,8 @@ public class CardPart extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "You have been defeated!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
             System.exit(0);
         } else if (monster.hp <= 0) {
-            JOptionPane.showMessageDialog(this, "You defeated the monster!", "Victory!", JOptionPane.INFORMATION_MESSAGE);
-            System.exit(0);
+            // JOptionPane.showMessageDialog(this, "You defeated the monster!", "Victory!", JOptionPane.INFORMATION_MESSAGE);
+            // System.exit(0);
         }
         cardPanel.revalidate();
         cardPanel.repaint();
