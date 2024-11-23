@@ -9,7 +9,8 @@
     "EGlDM": 0,
     "status": "",
     "imagePath": "/CardPart/resources/axe.png",
-    "count": 5
+    "count": 1,
+    "addtodis": 1
   },
   {
     "name": "заточка посоха и меча +1",
@@ -21,7 +22,8 @@
     "EGlDM": 0,
     "status": "",
     "imagePath": "/CardPart/resources/jar of pills.png",
-    "count": 0
+    "count": 0,
+    "addtodis": 0
   },
   {
     "name": "опасная перевязка",
@@ -33,7 +35,8 @@
     "EGlDM": 1,
     "status": "infect",
     "imagePath": "/CardPart/resources/jar of pills.png",
-    "count": 0
+    "count": 0,
+    "addtodis": 1
   },
   {
     "name": "Перевязка",
@@ -45,7 +48,8 @@
     "EGlDM": 0,
     "status": "",
     "imagePath": "/CardPart/resources/jar of pills.png",
-    "count": 1
+    "count": 1,
+    "addtodis": 0
   },
   {
     "name": "flamethrower",
@@ -57,7 +61,8 @@
     "EGlDM": 0,
     "status": "",
     "imagePath": "/CardPart/resources/flamethrower .png",
-    "count": 1
+    "count": 1,
+    "addtodis": 0
   },
   {
     "name": "regen crazy",
@@ -69,6 +74,7 @@
     "EGlDM": 0,
     "status": "insanity",
     "imagePath": "/CardPart/resources/insanity card1.png",
-    "count": 1
+    "count": 0,
+    "addtodis": 1
   }
 ]
