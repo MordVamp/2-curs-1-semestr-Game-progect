@@ -12,8 +12,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import com.google.gson.Gson;
-import java.util.Collections; 
+import com.google.gson.Gson;import java.util.Collections; // Добавлен импорт Collections
 import com.google.gson.reflect.TypeToken;
 import java.io.FileReader;
 import java.io.IOException;
@@ -256,7 +255,7 @@ public class CardPart extends JFrame implements ActionListener {
         // Add action panel
         actionPanel = new JPanel(new GridLayout(0, 1));
         // actionPanel.setOpaque(true);
-       // actionPanel.add(mouseTrackerPanel, BorderLayout.EAST);
+        actionPanel.add(mouseTrackerPanel);
         actionPanel.setVisible(false);
         BackgroundPanel actionPanel2 = new BackgroundPanel("/CardPart/resources/Fon.png");
         // Add pentagram button
@@ -379,9 +378,10 @@ public class CardPart extends JFrame implements ActionListener {
     }
 
     private void updateDisplay() {
-        if (player.hp>9&&player.hp<20) { ImageIcon originalHpIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart/Heart"+player.hp+".png"));
+        if (player.hp>4&&player.hp<21) { ImageIcon originalHpIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart/Heart"+player.hp+".png"));
             Image hpImage = originalHpIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-            playerInfo.setIcon(new ImageIcon(hpImage));}
+            playerInfo.setIcon(new ImageIcon(hpImage));
+            playerInfo.setOpaque(false);}
         else {ImageIcon originalHpIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart"+".png"));
             Image hpImage = originalHpIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
             playerInfo.setIcon(new ImageIcon(hpImage));};
@@ -421,7 +421,7 @@ public class CardPart extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "You have been defeated!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
             System.exit(0);
         } else if (monster.hp <= 0) {
-            // JOptionPane.showMessageDialog(this, "You defeated the monster!", "Victory!", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "You defeated the monster!", "Victory!", JOptionPane.INFORMATION_MESSAGE);
             // System.exit(0);
         }
         cardPanel.revalidate();
