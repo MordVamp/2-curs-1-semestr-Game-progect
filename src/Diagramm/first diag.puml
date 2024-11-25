@@ -1,0 +1,103 @@
+@startuml
+package CardPart {
+    class Card {
+        +int GlDM
+        +int EGlDM
+        +int damage
+        +int heal
+        +int energycard
+        +String name
+        +String type
+        +String status
+        +String imagePath
+        +int count
+        +int addtodis
+
+        +Card(String name, int damage, int heal, int energycard, String type, int GlDM, int EGlDM, String status, String imagePath, int addtodis)
+    }
+
+    class Player {
+        +int hp
+        +int energy
+        +List<Card> deck
+        +List<Card> hand
+        +List<Card> discardPile
+
+        +Player()
+        -loadCardsFromJson(): void
+        +drawCard(): void
+        +playCard(Card card, Monster enemy): void
+        -shuffleDiscardPileIntoDeck(): void
+    }
+
+    class BackgroundPanel {
+        -Image backgroundImage
+
+        +BackgroundPanel(String imagePath)
+        +paintComponent(Graphics g): void
+
+        static class MouseTrackerPanel {
+            -Point mousePoint
+            -Image eyeImage
+            -int circleRadius
+
+            +MouseTrackerPanel()
+            +paintComponent(Graphics g): void
+        }
+    }
+
+    class CardGame {
+        -Player player
+        -JLabel playerEnergy
+        -JLabel playerInfo
+        -Monster monster
+        -JPanel monsterPanel
+        -JLabel monsterInfo
+        -JLabel monsterActionIcon
+        -JButton endturn
+        -JPanel cardPanel
+        -Random random
+        -JButton pentagramButton
+        -JPanel actionPanel
+        -boolean actionsVisible
+        -int battlesWon
+
+        +CardGame()
+        -toggleActions(): void
+        -addActionButton(String imagePath, String tooltip, ActionListener listener): void
+        +actionPerformed(ActionEvent e): void
+        -updateDisplay(): void
+        -monsterAttack(): void
+        -applyInsanityMechanic(): void
+        +main(String[] args): void
+    }
+
+    class Monster {
+        +int hp
+        +String miPath
+        +Action[] actions
+    }
+
+    class Action {
+        +String type
+        +int value
+
+        +getType(): String
+        +getValue(): int
+    }
+
+    class RandomMonster {
+        +RandomMonster()
+    }
+
+    class Boss1 {
+        +Boss1()
+    }
+
+    CardGame "1" *-- "1" Player
+    CardGame "1" *-- "1" Monster
+    Player "1" *-- "0..*" Card
+    BackgroundPanel "1" *-- "0..*" MouseTrackerPanel
+    Monster "1" *-- "0..*" Action
+}
+@enduml
