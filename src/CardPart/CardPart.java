@@ -3,17 +3,13 @@ package CardPart;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.event.*;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import com.google.gson.Gson;
-import java.util.Collections; 
+import com.google.gson.Gson;import java.util.Collections;
 import com.google.gson.reflect.TypeToken;
 import java.io.FileReader;
 import java.io.IOException;
@@ -248,7 +244,7 @@ public class CardPart extends JFrame implements ActionListener {
         backgroundPanel.setLayout(new BorderLayout());
         //backgroundPanel.add(topPanel, BorderLayout.NORTH);
         backgroundPanel.add(cardPanel, BorderLayout.SOUTH);
-       // backgroundPanel.add(monsterPanel, BorderLayout.EAST);
+        // backgroundPanel.add(monsterPanel, BorderLayout.EAST);
 
         BackgroundPanel.MouseTrackerPanel mouseTrackerPanel = new BackgroundPanel.MouseTrackerPanel();
         mouseTrackerPanel.setPreferredSize(new Dimension(200, 200));
@@ -285,7 +281,7 @@ public class CardPart extends JFrame implements ActionListener {
         layeredPane.add(monsterPanel, JLayeredPane.PALETTE_LAYER);
         // Set bounds for the panels
         backgroundPanel.setBounds(0, 0, 1920, 1080);
-        actionPanel.setBounds(440, 200, 700, 500); // Adjust the size and position as needed
+        actionPanel.setBounds(440, 200, 700, 500);
         topPanel.setBounds(0, 0, 1920, 200);
         monsterPanel.setBounds(1600, 400, 200, 400);
         add(layeredPane);
@@ -294,47 +290,47 @@ public class CardPart extends JFrame implements ActionListener {
     }
 
     private void toggleActions() {
-            if (actionsVisible) {
-                // Удаляем все кнопки из actionPanel
-                Component[] components = actionPanel.getComponents();
-                for (Component component : components) {
-                    if (component instanceof JButton) {
-                        actionPanel.remove(component);
-                    }
+        if (actionsVisible) {
+            // Удаляем все кнопки из actionPanel
+            Component[] components = actionPanel.getComponents();
+            for (Component component : components) {
+                if (component instanceof JButton) {
+                    actionPanel.remove(component);
                 }
-                // Скрываем actionPanel
-                actionPanel.setVisible(false);
-                actionsVisible = false;
-            } else {
-                // Показываем actionPanel
-                actionPanel.setVisible(true);
-                // Добавляем кнопки действий
-                addActionButton("/CardPart/resources/HUD/BloodRitual/mediumattacksacrifice.png", "Action 1", new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        player.hp -= 1;
-                        monster.hp -= 3;
-                        updateDisplay();
-                    }
-                });
-                addActionButton("/CardPart/resources/HUD/BloodRitual/mediumattacksacrifice.png", "Action 2", new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        player.hp -= 3;
-                        monster.hp -= 6;
-                        updateDisplay();
-                    }
-                });
-                actionsVisible = true;
             }
-            // Обновляем отображение actionPanel
-            actionPanel.revalidate();
-            actionPanel.repaint();
+            // Скрываем actionPanel
+            actionPanel.setVisible(false);
+            actionsVisible = false;
+        } else {
+            // Показываем actionPanel
+            actionPanel.setVisible(true);
+            // Добавляем кнопки действий
+            addActionButton("/CardPart/resources/HUD/BloodRitual/mediumattacksacrifice.png", "Action 1", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    player.hp -= 1;
+                    monster.hp -= 3;
+                    updateDisplay();
+                }
+            });
+            addActionButton("/CardPart/resources/HUD/BloodRitual/mediumattacksacrifice.png", "Action 2", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    player.hp -= 3;
+                    monster.hp -= 6;
+                    updateDisplay();
+                }
+            });
+            actionsVisible = true;
         }
+        // Обновляем отображение actionPanel
+        actionPanel.revalidate();
+        actionPanel.repaint();
+    }
 
 
 
-        private void addActionButton(String imagePath, String tooltip, ActionListener listener) {
+    private void addActionButton(String imagePath, String tooltip, ActionListener listener) {
         ImageIcon actionIcon = new ImageIcon(getClass().getResource(imagePath));
         Image actionImg = actionIcon.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
         JButton actionButton = new JButton(new ImageIcon(actionImg));
@@ -343,8 +339,29 @@ public class CardPart extends JFrame implements ActionListener {
         actionButton.setBorderPainted(false);
         actionButton.setToolTipText(tooltip);
         actionButton.addActionListener(listener);
+
+        // Добавляем MouseListener для обработки событий наведения и ухода курсора
+        actionButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                // Увеличиваем размер кнопки при наведении
+                actionButton.setPreferredSize(new Dimension(80, 80));
+                actionButton.revalidate();
+                actionButton.repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                // Возвращаем исходный размер кнопки при уходе курсора
+                actionButton.setPreferredSize(new Dimension(70, 70));
+                actionButton.revalidate();
+                actionButton.repaint();
+            }
+        });
+
         actionPanel.add(actionButton);
     }
+
 
 
     @Override
@@ -379,27 +396,26 @@ public class CardPart extends JFrame implements ActionListener {
     }
 
     private void updateDisplay() {
-        if (player.hp>4&&player.hp<21) { ImageIcon originalHpIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart/Heart"+player.hp+".png"));
+        if (player.hp > 1 && player.hp < 20) {
+            ImageIcon originalHpIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart" + player.hp + ".png"));
             Image hpImage = originalHpIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
             playerInfo.setIcon(new ImageIcon(hpImage));
-         //   playerInfo.setOpaque(false);
-                                       }
-        else {ImageIcon originalHpIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart"+".png"));
+            playerInfo.setOpaque(false);
+        } else {
+            ImageIcon originalHpIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart.png"));
             Image hpImage = originalHpIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-            playerInfo.setIcon(new ImageIcon(hpImage));};
+            playerInfo.setIcon(new ImageIcon(hpImage));
+        }
 
-        //ImageIcon originalEnergyIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart/Heart"+player.energy+".png"));
-        if (player.energy>0&&player.energy<4)  {
-            ImageIcon originalEnergyIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Stamina/Stamina"+player.energy+".png"));
-            Image hpImage = originalEnergyIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-            playerEnergy.setIcon(new ImageIcon(hpImage));}
-        else { ImageIcon originalEnergyIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Stamina"+".png"));
-
+        if (player.energy > 0 && player.energy < 3) {
+            ImageIcon originalEnergyIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Stamina" + player.energy + ".png"));
             Image energyImage = originalEnergyIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-
-            //playerEnergy.setIcon(createIconLabel(new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Stamina.png")), String.valueOf(player.energy)).getIcon());
             playerEnergy.setIcon(new ImageIcon(energyImage));
-        };
+        } else {
+            ImageIcon originalEnergyIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Stamina.png"));
+            Image energyImage = originalEnergyIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            playerEnergy.setIcon(new ImageIcon(energyImage));
+        }
 
         monsterInfo.setText("Monster HP: " + monster.hp);
         cardPanel.removeAll();
@@ -407,7 +423,7 @@ public class CardPart extends JFrame implements ActionListener {
         for (Card card : player.hand) {
             ImageIcon originalIcon = new ImageIcon(getClass().getResource(card.imagePath));
             Image img = originalIcon.getImage();
-            Image scaledImg = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+            Image scaledImg = img.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
             ImageIcon scaledIcon = new ImageIcon(scaledImg);
             JButton cardButton = new JButton(scaledIcon);
             cardButton.setPreferredSize(new Dimension(200, 200));
@@ -416,6 +432,26 @@ public class CardPart extends JFrame implements ActionListener {
             cardButton.setBorder(customBorder);
             cardButton.setContentAreaFilled(false);
             cardButton.addActionListener(new CardActionListener(card));
+
+            // Add MouseListener to handle hover effect
+            cardButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    // Increase the size of the card button when the mouse enters
+                    cardButton.setPreferredSize(new Dimension(300, 300));
+                    cardButton.revalidate();
+                    cardButton.repaint();
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    // Restore the original size of the card button when the mouse exits
+                    cardButton.setPreferredSize(new Dimension(200, 200));
+                    cardButton.revalidate();
+                    cardButton.repaint();
+                }
+            });
+
             cardPanel.add(cardButton);
         }
 
@@ -426,19 +462,12 @@ public class CardPart extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "You defeated the monster!", "Victory!", JOptionPane.INFORMATION_MESSAGE);
             // System.exit(0);
         }
+
         cardPanel.revalidate();
         cardPanel.repaint();
     }
 
-//    private JLabel createIconLabel(ImageIcon icon, String text) {
-//        JLabel label = new JLabel(icon);
-//        label.setHorizontalTextPosition(JLabel.CENTER);
-//        label.setVerticalTextPosition(JLabel.CENTER);
-//        label.setText(text);
-//        label.setForeground(Color.WHITE);
-//        label.setFont(new Font("Arial", Font.BOLD, 20));
-//        return label;
-//    }
+
 
     private class CardActionListener implements ActionListener {
         private final Card card;
