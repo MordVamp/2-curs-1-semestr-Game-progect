@@ -194,14 +194,20 @@ public class CardPart extends JFrame implements ActionListener {
         monster = new RandomMonster();
 
         setTitle("Lafcraft Card Game");
-        setSize(1920, 1080);
+        // Get the screen resolution modifier
+
+
+        // Set the frame size based on the screen resolution modifier
+        setSize((int) (1920 / Gl.GlDisMod), (int) (1920 / Gl.GlDisMod));
+        //setSize(Gl.GlDisWid, Gl.GlDisHei);
+        System.out.println(Gl.GlDisMod);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
         ImageIcon originalHpIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart/Heart.png"));
         ImageIcon originalEnergyIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Stamina/Stamina.png"));
 
-        Image hpImage = originalHpIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+        Image hpImage = originalHpIcon.getImage().getScaledInstance((int)(100/Gl.GlDisMod), (int)(100/Gl.GlDisMod), Image.SCALE_SMOOTH);
         Image energyImage = originalEnergyIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
 
         ImageIcon hpIcon = new ImageIcon(hpImage);
@@ -219,7 +225,7 @@ public class CardPart extends JFrame implements ActionListener {
 
         ImageIcon monsterIcon = new ImageIcon(getClass().getResource(monster.miPath));
         Image img = monsterIcon.getImage();
-        Image scaledImg = img.getScaledInstance(240, 240, Image.SCALE_SMOOTH);
+        Image scaledImg = img.getScaledInstance((int)(240/Gl.GlDisMod), (int)(240/Gl.GlDisMod), Image.SCALE_SMOOTH);
         ImageIcon scaledMonsterIcon = new ImageIcon(scaledImg);
         JLabel monsterImageLabel = new JLabel(scaledMonsterIcon);
         monsterPanel.add(monsterImageLabel, BorderLayout.CENTER);
@@ -247,7 +253,7 @@ public class CardPart extends JFrame implements ActionListener {
        // backgroundPanel.add(monsterPanel, BorderLayout.EAST);
 
         BackgroundPanel.MouseTrackerPanel mouseTrackerPanel = new BackgroundPanel.MouseTrackerPanel();
-        mouseTrackerPanel.setPreferredSize(new Dimension(200, 200));
+        mouseTrackerPanel.setPreferredSize(new Dimension((int)(200/Gl.GlDisMod), (int)(200/Gl.GlDisMod)));
         mouseTrackerPanel.setOpaque(false);
         // Add action panel
         actionPanel = new JPanel(new GridLayout(0, 1));
@@ -257,9 +263,9 @@ public class CardPart extends JFrame implements ActionListener {
         BackgroundPanel actionPanel2 = new BackgroundPanel("/CardPart/resources/Fon.png");
         // Add pentagram button
         ImageIcon pentagramIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/BloodRitual/BloodRitual.png"));
-        Image pentagramImg = pentagramIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        Image pentagramImg = pentagramIcon.getImage().getScaledInstance((int)(50/Gl.GlDisMod), (int)(50/Gl.GlDisMod), Image.SCALE_SMOOTH);
         pentagramButton = new JButton(new ImageIcon(pentagramImg));
-        pentagramButton.setPreferredSize(new Dimension(50, 50));
+        pentagramButton.setPreferredSize(new Dimension((int)(50/Gl.GlDisMod), (int)(50/Gl.GlDisMod)));
         pentagramButton.setContentAreaFilled(false);
         pentagramButton.setBorderPainted(false);
         pentagramButton.addActionListener(new ActionListener() {
@@ -274,16 +280,16 @@ public class CardPart extends JFrame implements ActionListener {
 
         // Use JLayeredPane as the main panel
         JLayeredPane layeredPane = new JLayeredPane();
-        layeredPane.setPreferredSize(new Dimension(1920, 1080));
+        layeredPane.setPreferredSize(new Dimension(Gl.GlDisWid, Gl.GlDisHei));
         layeredPane.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
         layeredPane.add(actionPanel, JLayeredPane.PALETTE_LAYER);
         layeredPane.add(topPanel, JLayeredPane.PALETTE_LAYER);
         layeredPane.add(monsterPanel, JLayeredPane.PALETTE_LAYER);
         // Set bounds for the panels
-        backgroundPanel.setBounds(0, 0, 1920, 1080);
-        actionPanel.setBounds(440, 200, 700, 500); // Adjust the size and position as needed
-        topPanel.setBounds(0, 0, 1920, 200);
-        monsterPanel.setBounds(1600, 400, 200, 400);
+        backgroundPanel.setBounds(0, 0, (int)(1920/Gl.GlDisMod),(int)(1080/Gl.GlDisMod));
+        actionPanel.setBounds((int)(440/Gl.GlDisMod), (int)(200/Gl.GlDisMod), (int)(700/Gl.GlDisMod), (int)(500/Gl.GlDisMod)); // Adjust the size and position as needed
+        topPanel.setBounds(0, 0, Gl.GlDisWid, (int)(200/Gl.GlDisMod));
+        monsterPanel.setBounds((int)(1600/Gl.GlDisMod), (int)(400/Gl.GlDisMod), (int)(200/Gl.GlDisMod), (int)(400/Gl.GlDisMod));
         add(layeredPane);
         player.drawCard();
         updateDisplay();
@@ -330,9 +336,9 @@ public class CardPart extends JFrame implements ActionListener {
 
 
 
-        private void addActionButton(String imagePath, String tooltip, ActionListener listener) {
+    private void addActionButton(String imagePath, String tooltip, ActionListener listener) {
         ImageIcon actionIcon = new ImageIcon(getClass().getResource(imagePath));
-        Image actionImg = actionIcon.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
+        Image actionImg = actionIcon.getImage().getScaledInstance((int)(70/Gl.GlDisMod), (int)(70/Gl.GlDisMod), Image.SCALE_SMOOTH);
         JButton actionButton = new JButton(new ImageIcon(actionImg));
         actionButton.setPreferredSize(new Dimension(70, 70));
         actionButton.setContentAreaFilled(false);
@@ -376,24 +382,24 @@ public class CardPart extends JFrame implements ActionListener {
     }
 
     private void updateDisplay() {
-        if (player.hp > 1 && player.hp < 21) {
+        if (player.hp > 0 && player.hp < 21) {
             ImageIcon originalHpIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart/Heart" + player.hp + ".png"));
-            Image hpImage = originalHpIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            Image hpImage = originalHpIcon.getImage().getScaledInstance((int)(100/Gl.GlDisMod), (int)(100/Gl.GlDisMod), Image.SCALE_SMOOTH);
             playerInfo.setIcon(new ImageIcon(hpImage));
             playerInfo.setOpaque(false);
         } else {
             ImageIcon originalHpIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Heart/Heart.png"));
-            Image hpImage = originalHpIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            Image hpImage = originalHpIcon.getImage().getScaledInstance((int)(100/Gl.GlDisMod), (int)(100/Gl.GlDisMod), Image.SCALE_SMOOTH);
             playerInfo.setIcon(new ImageIcon(hpImage));
         }
 
         if (player.energy > 0 && player.energy < 4) {
             ImageIcon originalEnergyIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Stamina/Stamina" + player.energy + ".png"));
-            Image energyImage = originalEnergyIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            Image energyImage = originalEnergyIcon.getImage().getScaledInstance((int)(100/Gl.GlDisMod), (int)(100/Gl.GlDisMod), Image.SCALE_SMOOTH);
             playerEnergy.setIcon(new ImageIcon(energyImage));
         } else {
             ImageIcon originalEnergyIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/Stamina/Stamina.png"));
-            Image energyImage = originalEnergyIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            Image energyImage = originalEnergyIcon.getImage().getScaledInstance((int)(100/Gl.GlDisMod), (int)(100/Gl.GlDisMod), Image.SCALE_SMOOTH);
             playerEnergy.setIcon(new ImageIcon(energyImage));
         }
 
@@ -403,10 +409,10 @@ public class CardPart extends JFrame implements ActionListener {
         for (Card card : player.hand) {
             ImageIcon originalIcon = new ImageIcon(getClass().getResource(card.imagePath));
             Image img = originalIcon.getImage();
-            Image scaledImg = img.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+            Image scaledImg = img.getScaledInstance((int)(300/Gl.GlDisMod), (int)(300/Gl.GlDisMod), Image.SCALE_SMOOTH);
             ImageIcon scaledIcon = new ImageIcon(scaledImg);
             JButton cardButton = new JButton(scaledIcon);
-            cardButton.setPreferredSize(new Dimension(200, 200));
+            cardButton.setPreferredSize(new Dimension((int)(200/Gl.GlDisMod), (int)(200/Gl.GlDisMod)));
             Color darkRed = new Color(202, 41, 41);
             LineBorder customBorder = new LineBorder(darkRed, 2);
             cardButton.setBorder(customBorder);
@@ -418,7 +424,7 @@ public class CardPart extends JFrame implements ActionListener {
                 @Override
                 public void mouseEntered(MouseEvent e) {
                     // Increase the size of the card button when the mouse enters
-                    cardButton.setPreferredSize(new Dimension(300, 300));
+                    cardButton.setPreferredSize(new Dimension((int)(300/Gl.GlDisMod), (int)(300/Gl.GlDisMod)));
                     cardButton.revalidate();
                     cardButton.repaint();
                 }
@@ -426,7 +432,7 @@ public class CardPart extends JFrame implements ActionListener {
                 @Override
                 public void mouseExited(MouseEvent e) {
                     // Restore the original size of the card button when the mouse exits
-                    cardButton.setPreferredSize(new Dimension(200, 200));
+                    cardButton.setPreferredSize(new Dimension((int)(200/Gl.GlDisMod), (int)(200/Gl.GlDisMod)));
                     cardButton.revalidate();
                     cardButton.repaint();
                 }
@@ -469,7 +475,7 @@ public class CardPart extends JFrame implements ActionListener {
             String iconPath = "/CardPart/resources/m" + actionType + ".png"; // Path to the action icon
             ImageIcon actionIcon = new ImageIcon(getClass().getResource(iconPath));
             Image img = actionIcon.getImage();
-            Image scaledImg = img.getScaledInstance(50, 50, Image.SCALE_SMOOTH); // Scale the icon
+            Image scaledImg = img.getScaledInstance((int)(50/Gl.GlDisMod), (int)(50/Gl.GlDisMod), Image.SCALE_SMOOTH); // Scale the icon
             ImageIcon scaledActionIcon = new ImageIcon(scaledImg);
             monsterActionIcon.setIcon(scaledActionIcon); // Update the monster action icon label
             if (actionType.equals("attack")) {
