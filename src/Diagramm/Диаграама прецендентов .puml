@@ -1,0 +1,22 @@
+@startuml
+ actor User
+
+package "Card Game System" {
+    usecase "Start Game" as UC1
+    usecase "Blood Buttons" as UC61
+    usecase "Use Card" as UC2
+    usecase "End Turn" as UC3
+    usecase "Monster Attack" as UC4
+    usecase "Check Victory Condition" as UC5
+    usecase "Blood Conract" as UC6
+}
+
+User --> UC1 : initiates
+User --> UC6 : new window
+User --> UC2 : uses
+User --> UC3 : ends
+
+UC6-->UC61 : triggers
+UC3 --> UC4 : triggers
+UC3 --> UC5 : leads to
+@enduml
