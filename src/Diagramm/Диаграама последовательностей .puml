@@ -1,0 +1,46 @@
+@startuml
+actor User
+participant CardPart
+participant Player
+participant Card
+participant Monster
+
+User -> CardPart: startGame()
+activate CardPart
+CardPart -> Player: drawCard()
+activate Player
+Player -> Card: removeCardFromDeck()
+activate Card
+Card --> Player: returnCard
+deactivate Card
+Player -> Player: addCardToHand()
+deactivate Player
+
+User -> CardPart: endTurn()
+activate CardPart
+CardPart -> Player: drawCardsForTurn()
+activate Player
+Player -> Player: resetEnergy()
+Player -> Player: resetInfect()
+Player -> Player: resetInsanity()
+deactivate Player
+CardPart -> Monster: attackPlayer()
+activate Monster
+Monster -> Player: applyDamage()
+deactivate Monster
+CardPart -> CardPart: checkVictoryCondition()
+deactivate CardPart
+
+User -> CardPart: useCard(card)
+activate CardPart
+CardPart -> Player: useCard(card)
+activate Player
+Player -> Card: applyEffect()
+activate Card
+Card --> Player: effectApplied
+deactivate Card
+Player -> Monster: applyDamage()
+deactivate Player
+CardPart -> CardPart: updateDisplay()
+deactivate CardPart
+@enduml
