@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Random;
 import com.google.gson.Gson;import java.util.Collections;
 import com.google.gson.reflect.TypeToken;
-import java.io.FileReader;
+
 import java.io.IOException;
 import java.lang.reflect.Type;
 
@@ -126,7 +126,7 @@ class Player {
 //    }
 }
 
-class BackgroundPanel extends JPanel {
+ class BackgroundPanel extends JPanel {
     private Image backgroundImage;
 
     public BackgroundPanel(String imagePath) {
@@ -138,54 +138,52 @@ class BackgroundPanel extends JPanel {
         super.paintComponent(g);
         g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
     }
+}
 
-    static class MouseTrackerPanel extends JPanel {
-        private Point mousePoint = new Point(0, 0);
-        private Image eyeImage;
-        private int circleRadius = 50; // Radius of the transparent circular area
+ class MouseTrackerPanel extends JPanel {
+    private Point mousePoint = new Point(0, 0);
+    private Image eyeImage;
+    private int circleRadius = (int)(50 * Gl.GlDisMod); // Radius of the transparent circular area
 
-        public MouseTrackerPanel() {
-            eyeImage = new ImageIcon(getClass().getResource("/CardPart/resources/eye.png")).getImage();
-            addMouseMotionListener(new MouseMotionAdapter() {
-                @Override
-                public void mouseMoved(MouseEvent e) {
-                    mousePoint = e.getPoint();
-                    repaint();
-                }
-            });
-        }
+    public MouseTrackerPanel() {
+        eyeImage = new ImageIcon(getClass().getResource("/CardPart/resources/eye.png")).getImage();
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                mousePoint = e.getPoint();
+                repaint();
+            }
+        });
+    }
 
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        // Draw the eye image in the center
+        int centerX = getWidth() / 2;
+        int centerY = getHeight() / 2;
+        int eyeWidth = (int)(201 * Gl.GlDisMod); // Width of the eye image
+        int eyeHeight = (int)(200 * Gl.GlDisMod); // Height of the eye image
+        g.drawImage(eyeImage, centerX - eyeWidth / 2, centerY - eyeHeight / 2, eyeWidth, eyeHeight, this);
 
-            // Draw the eye image in the center
-            int centerX = getWidth() / 2;
-            int centerY = getHeight() / 2;
-            int eyeWidth = 200; // Width of the eye image
-            int eyeHeight = 200; // Height of the eye image
-            g.drawImage(eyeImage, centerX - eyeWidth / 2, centerY - eyeHeight / 2, eyeWidth, eyeHeight, this);
-
-
-
-            // Draw the red dot within the circular area
-            int dotRadius = 5;
-            int dotX = Math.max(centerX - circleRadius + dotRadius, Math.min(centerX + circleRadius - dotRadius, mousePoint.x));
-            int dotY = Math.max(centerY - circleRadius + dotRadius, Math.min(centerY + circleRadius - dotRadius, mousePoint.y));
-            g.setColor(Color.RED);
-            g.fillOval(dotX - dotRadius, dotY - dotRadius, dotRadius * 2, dotRadius * 2);
-        }
+        // Draw the red dot within the circular area
+        int dotRadius = 5;
+        int dotX = Math.max(centerX - circleRadius + dotRadius, Math.min(centerX + circleRadius - dotRadius, mousePoint.x));
+        int dotY = Math.max(centerY - circleRadius + dotRadius, Math.min(centerY + circleRadius - dotRadius, mousePoint.y));
+        g.setColor(Color.RED);
+        g.fillOval(dotX - dotRadius, dotY - dotRadius, dotRadius * 2, dotRadius * 2);
     }
 }
 
 public class CardPart extends JFrame implements ActionListener {
     private Player player;private JLabel playerEnergy;private JLabel playerInfo;
-    private Monster monster;private JPanel monsterPanel;  private JLabel monsterInfo;
-    private JLabel monsterActionIcon; // New label for monster action
+
+    private Monster monster;private JPanel monsterPanel;private JLabel monsterInfo;private JLabel monsterActionIcon;
+    private JPanel monsterPanelHPIMG;
 
     private JButton endturn;private JPanel cardPanel; private Random random = new Random();
-    private JButton pentagramButton;
-    private JPanel actionPanel;
+
+    private JButton pentagramButton;private JPanel actionPanel;
     private boolean actionsVisible = false;
     int battlesWon = Gl.battlesWon;
     int Bosscounter;
@@ -194,9 +192,6 @@ public class CardPart extends JFrame implements ActionListener {
         monster = new RandomMonster();
 
         setTitle("Lafcraft Card Game");
-        // Get the screen resolution modifier
-
-
         // Set the frame size based on the screen resolution modifier
         setSize((int) (1920 / Gl.GlDisMod), (int) (1920 / Gl.GlDisMod));
         //setSize(Gl.GlDisWid, Gl.GlDisHei);
@@ -217,6 +212,7 @@ public class CardPart extends JFrame implements ActionListener {
         playerEnergy = new JLabel(energyIcon);
         monsterInfo = new JLabel("Monster HP: " + monster.hp);
         monsterActionIcon = new JLabel();
+        monsterPanelHPIMG= new JPanel();
         endturn = new JButton("End Turn");
         endturn.addActionListener(this);
         cardPanel = new JPanel(new FlowLayout());
@@ -229,8 +225,15 @@ public class CardPart extends JFrame implements ActionListener {
         ImageIcon scaledMonsterIcon = new ImageIcon(scaledImg);
         JLabel monsterImageLabel = new JLabel(scaledMonsterIcon);
         monsterPanel.add(monsterImageLabel, BorderLayout.CENTER);
+        ImageIcon monsterIconHP = new ImageIcon(getClass().getResource("/CardPart/resources/mHP2.png"));
+        Image imgHP = monsterIconHP.getImage();
+        Image scaledImgHP = imgHP.getScaledInstance((int)(240/Gl.GlDisMod), (int)(240/Gl.GlDisMod), Image.SCALE_SMOOTH);
+        ImageIcon scaledMonsterIconHP = new ImageIcon(scaledImgHP);
+        JLabel monsterImageLabelHP = new JLabel(scaledMonsterIconHP);
+        //monsterPanelHPIMG.add(monsterImageLabelHP);
 
         JPanel monsterInfoPanel = new JPanel(new FlowLayout());
+        monsterInfoPanel.setOpaque(false);
         monsterInfoPanel.add(monsterInfo);
         monsterInfoPanel.add(monsterActionIcon);
         monsterPanel.add(monsterInfoPanel, BorderLayout.NORTH);
@@ -241,6 +244,8 @@ public class CardPart extends JFrame implements ActionListener {
         playerInfo.setForeground(darkRed);
         playerEnergy.setForeground(darkRed);
         monsterInfo.setForeground(darkRed);
+        //monsterInfo.setOpaque(false);
+        monsterInfo.setFont(new Font("Arial", Font.BOLD, 40));
         endturn.setForeground(darkRed);
         topPanel.add(playerEnergy);
         topPanel.add(playerInfo);
@@ -252,18 +257,30 @@ public class CardPart extends JFrame implements ActionListener {
         backgroundPanel.add(cardPanel, BorderLayout.SOUTH);
        // backgroundPanel.add(monsterPanel, BorderLayout.EAST);
 
-        BackgroundPanel.MouseTrackerPanel mouseTrackerPanel = new BackgroundPanel.MouseTrackerPanel();
+        MouseTrackerPanel mouseTrackerPanel = new MouseTrackerPanel();
         mouseTrackerPanel.setPreferredSize(new Dimension((int)(200/Gl.GlDisMod), (int)(200/Gl.GlDisMod)));
         mouseTrackerPanel.setOpaque(false);
         // Add action panel
-        actionPanel = new JPanel(new GridLayout(0, 1));
-        // actionPanel.setOpaque(true);
+        actionPanel = new JPanel(new GridLayout(0, 1)) {
+            private Image backgroundImage;
+
+            {
+                backgroundImage = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/BloodRitual/Eye_animation.gif")).getImage();
+            }
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+
         actionPanel.add(mouseTrackerPanel);
         actionPanel.setVisible(false);
         BackgroundPanel actionPanel2 = new BackgroundPanel("/CardPart/resources/Fon.png");
         // Add pentagram button
-        ImageIcon pentagramIcon = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/BloodRitual/BloodRitual.png"));
-        Image pentagramImg = pentagramIcon.getImage().getScaledInstance((int)(50/Gl.GlDisMod), (int)(50/Gl.GlDisMod), Image.SCALE_SMOOTH);
+        ImageIcon BloodRitual = new ImageIcon(getClass().getResource("/CardPart/resources/HUD/BloodRitual/BloodRitual.png"));
+        Image pentagramImg = BloodRitual.getImage().getScaledInstance((int)(50/Gl.GlDisMod), (int)(50/Gl.GlDisMod), Image.SCALE_SMOOTH);
         pentagramButton = new JButton(new ImageIcon(pentagramImg));
         pentagramButton.setPreferredSize(new Dimension((int)(50/Gl.GlDisMod), (int)(50/Gl.GlDisMod)));
         pentagramButton.setContentAreaFilled(false);
@@ -271,6 +288,7 @@ public class CardPart extends JFrame implements ActionListener {
         pentagramButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 toggleActions();
             }
         });
@@ -282,14 +300,17 @@ public class CardPart extends JFrame implements ActionListener {
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setPreferredSize(new Dimension(Gl.GlDisWid, Gl.GlDisHei));
         layeredPane.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
+       // layeredPane.add(monsterPanelHPIMG, JLayeredPane.PALETTE_LAYER);
         layeredPane.add(actionPanel, JLayeredPane.PALETTE_LAYER);
         layeredPane.add(topPanel, JLayeredPane.PALETTE_LAYER);
-        layeredPane.add(monsterPanel, JLayeredPane.PALETTE_LAYER);
+        layeredPane.add(monsterPanel, JLayeredPane.MODAL_LAYER);
         // Set bounds for the panels
         backgroundPanel.setBounds(0, 0, (int)(1920/Gl.GlDisMod),(int)(1080/Gl.GlDisMod));
         actionPanel.setBounds((int)(440/Gl.GlDisMod), (int)(200/Gl.GlDisMod), (int)(700/Gl.GlDisMod), (int)(500/Gl.GlDisMod)); // Adjust the size and position as needed
         topPanel.setBounds(0, 0, Gl.GlDisWid, (int)(200/Gl.GlDisMod));
         monsterPanel.setBounds((int)(1600/Gl.GlDisMod), (int)(400/Gl.GlDisMod), (int)(200/Gl.GlDisMod), (int)(400/Gl.GlDisMod));
+       // monsterPanelHPIMG.setBounds((int)(1580/Gl.GlDisMod), (int)(300/Gl.GlDisMod), (int)(200/Gl.GlDisMod), (int)(200/Gl.GlDisMod));
+      //  monsterPanelHPIMG.setOpaque(false);
         add(layeredPane);
         player.drawCard();
         updateDisplay();
@@ -322,7 +343,7 @@ public class CardPart extends JFrame implements ActionListener {
                 addActionButton("/CardPart/resources/HUD/BloodRitual/mediumattacksacrifice.png", "Action 2", new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        player.hp -= 3;
+                        player.hp -= 2;
                         monster.hp -= 6;
                         updateDisplay();
                     }
@@ -360,8 +381,7 @@ public class CardPart extends JFrame implements ActionListener {
                 Gl.infect--;
             }
             player.energy = Gl.energyglobal;
-            monsterAttack();
-            updateDisplay();
+
             if (Gl.insanity > 0) {
                 applyInsanityMechanic();
             }
@@ -378,7 +398,8 @@ public class CardPart extends JFrame implements ActionListener {
                     System.exit(0);
                 }
             }
-        }
+            monsterAttack();
+            updateDisplay();}
     }
 
     private void updateDisplay() {
@@ -403,7 +424,7 @@ public class CardPart extends JFrame implements ActionListener {
             playerEnergy.setIcon(new ImageIcon(energyImage));
         }
 
-        monsterInfo.setText("Monster HP: " + monster.hp);
+        monsterInfo.setText("" + monster.hp);
         cardPanel.removeAll();
 
         for (Card card : player.hand) {
@@ -482,6 +503,8 @@ public class CardPart extends JFrame implements ActionListener {
                 player.hp -= action.getValue() + Gl.EGlDM; // damage
             } else if (actionType.equals("heal")) {
                 monster.hp += action.getValue(); // heal
+            }else if (actionType.equals("shuffle_curse")) {
+                player.deck.add(new Card("shuffle_curse", 0, 0, 2, "shuffle_curse", 0, 0, "", "/CardPart/resources/curse.gif",0));
             }
         }
     }
