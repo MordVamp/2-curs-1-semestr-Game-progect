@@ -1,0 +1,140 @@
+@startuml
+
+class Gl {
+    +static int hpGL = 20
+    +static int energyglobal = 3
+    +static int GlDW = 3
+    +static int GlDM = 0
+    +static int EGlDM = 0
+    +static int DeckExampel = 7
+    +static boolean poison = false
+    +static int infect = 0
+    +static int Nstatus
+    +static int insanity = 0
+    +static int battlesWon = 0
+    +static DisplayResolutionChecker checker = new DisplayResolutionChecker()
+    +static double GlDisMod = checker.getGlDisplaysizeMod()
+}
+
+class Card {
+    +int GIDM
+    +int EGIDM
+    +int damage
+    +int heal
+    +int energycard
+    +String name
+    +String type
+    +String status
+    +String imagePath
+    +String originalImagePath
+    +int count
+    +int addtodis
+
+    +Card(String name, int damage, int heal, int energycard, String type, int GIDM, int EGIDM, String status, String imagePath, String originalImagePath, int addtodis)
+}
+
+class Player {
+    +int hp
+    +int energy
+    +List<Card> deck
+    +List<Card> hand
+    +List<Card> discardPile
+
+    +Player()
+    -loadCardsFromJson(): void
+    +drawCard(): void
+    +playCard(Card card, Monster enemy): void
+    -shuffleDiscardPileIntoDeck(): void
+}
+
+class BackgroundPanel {
+    -Image backgroundImage
+
+    +BackgroundPanel(String imagePath)
+    +paintComponent(Graphics g): void
+}
+
+class MouseTrackerPanel {
+    -Point mousePoint
+    -Image eyeImage
+    -int circleRadius
+
+    +MouseTrackerPanel()
+    +paintComponent(Graphics g): void
+}
+
+class CardPart {
+    -Player player
+    -JLabel playerEnergy
+    -JLabel playerInfo
+    -Monster monster
+    -JPanel monsterPanel
+    -JLabel monsterInfo
+    -JLabel monsterActionIcon
+    -JButton endturn
+    -JPanel cardPanel
+    -Random random
+    -JButton pentagramButton
+    -JPanel actionPanel
+    -boolean actionsVisible
+    -int battlesWon
+
+    +CardPart()
+    -toggleActions(): void
+    -addActionButton(String imagePath, String tooltip, ActionListener listener): void
+    +actionPerformed(ActionEvent e): void
+    -updateDisplay(): void
+    -monsterAttack(): void
+    -applyInsanityMechanic(): void
+    +main(String[] args): void
+}
+
+class Monster {
+    +int hp
+    +String name
+    +String description
+    +String miPath
+    +Action[] actions
+
+    +Monster(int hp, String name, String description, Action[] actions, String miPath)
+}
+
+class RandomMonster {
+    +RandomMonster()
+}
+
+class Boss1 {
+    +Boss1()
+    +getCurrentStage(): String
+    +updateStage(int hp): void
+}
+
+class Action {
+    +String type
+    +int value
+
+    +Action(String type, int value)
+    +getType(): String
+    +getValue(): int
+}
+
+class DisplayResolutionChecker {
+    +getGlDisplaysizeMod(): double
+}
+
+
+
+CardPart "1" *-- "1" Player
+CardPart "1" *-- "1" Monster
+CardPart "1" *-- "1" BackgroundPanel
+Player "1" *-- "0..*" Card
+BackgroundPanel "1" *-- "0..*" MouseTrackerPanel
+Monster "1" *-- "0..*" Action
+RandomMonster --|> Monster
+Boss1 --|> Monster
+Gl "1" *-- "1" DisplayResolutionChecker
+CardPart ..> Gl
+Player ..> Gl
+Monster ..> Gl
+
+@enduml
