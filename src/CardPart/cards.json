@@ -9,7 +9,8 @@
     "EGlDM": 0,
     "status": "",
     "imagePath": "/CardPart/resources/axe.png",
-    "count": 1,
+    "originalImagePath": "/CardPart/resources/axe.png",
+    "count": 2,
     "addtodis": 1
   },
   {
@@ -22,6 +23,7 @@
     "EGlDM": 0,
     "status": "",
     "imagePath": "/CardPart/resources/jar of pills.png",
+    "originalImagePath": "/CardPart/resources/jar of pills.png",
     "count": 0,
     "addtodis": 0
   },
@@ -35,20 +37,22 @@
     "EGlDM": 1,
     "status": "infect",
     "imagePath": "/CardPart/resources/jar of pills.png",
+    "originalImagePath": "/CardPart/resources/jar of pills.png",
     "count": 0,
     "addtodis": 1
   },
   {
-    "name": "Перевязка",
+    "name": "Таблетки",
     "damage": 0,
     "heal": 2,
     "energycard": 1,
     "type": "heal",
     "GlDM": 0,
     "EGlDM": 0,
-    "status": "",
+    "status": "clear",
     "imagePath": "/CardPart/resources/jar of pills.png",
-    "count": 1,
+    "originalImagePath": "/CardPart/resources/jar of pills.png",
+    "count": 4,
     "addtodis": 0
   },
   {
@@ -61,7 +65,8 @@
     "EGlDM": 0,
     "status": "",
     "imagePath": "/CardPart/resources/flamethrower .png",
-    "count": 1,
+    "originalImagePath": "/CardPart/resources/flamethrower .png",
+    "count": 2,
     "addtodis": 0
   },
   {
@@ -74,7 +79,8 @@
     "EGlDM": 0,
     "status": "insanity",
     "imagePath": "/CardPart/resources/insanity card1.png",
-    "count": 0,
+    "originalImagePath": "/CardPart/resources/insanity card1.png",
+    "count": 1,
     "addtodis": 1
   }
 ]
