@@ -41,20 +41,30 @@ class Monster {
 class RandomMonster extends Monster {
     private static final Monster[] monsters = {
             new Monster(30, "New Cultist SN", "A new cultist with tentacles and hands.",
-                    new Action[] { new Action("attack", 1), new Action("heal", 5), new Action("shuffle_curse", 90000900+1) },
+                    new Action[] { new Action("attack", 4), new Action("heal", 5), new Action("shuffle_curse", 90000900+1) },
                     "/CardPart/resources/monster001.png"),
             new Monster(41, "Regular Cultist SN", "A regular cultist with tentacles using a weapon.",
-                    new Action[] { new Action("attack", 1), new Action("heal", 10), new Action("block", 20) },
+                    new Action[] { new Action("attack", 4), new Action("heal", 10), new Action("block", 20) },
                     "/CardPart/resources/monster002.png"),
             new Monster(60, "Old Cultist SN", "An old cultist with tentacles.",
-                    new Action[] { new Action("attack", 2), new Action("heal", 15), new Action("shuffle_curse", 90000900+2) },//9 служат разделителем числа и замешиваемых карт
+                    new Action[] { new Action("attack", 8), new Action("heal", 15), new Action("shuffle_curse", 90000900+2) },//9 служат разделителем числа и замешиваемых карт
                     "/CardPart/resources/monster003.png")
     };
 
+//    public TrueRandomMonster() {
+//        super(getRandomMonster().hp, getRandomMonster().name,
+//                getRandomMonster().description, getRandomMonster().actions,
+//                getRandomMonster().miPath);
+//    }
+
+
+
+
     public RandomMonster() {
-        super(getRandomMonster().hp, getRandomMonster().name,
-                getRandomMonster().description, getRandomMonster().actions,
-                getRandomMonster().miPath);
+        Monster randomMonster = getRandomMonster();
+        super(randomMonster.hp, randomMonster.name,
+                randomMonster.description, randomMonster.actions,
+                randomMonster.miPath);
     }
 
     private static Monster getRandomMonster() {
