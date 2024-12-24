@@ -12,7 +12,6 @@ import java.util.Random;
 import com.google.gson.Gson;import java.util.Collections;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 
 class Card {
@@ -25,10 +24,11 @@ class Card {
     String type;
     String status;
     String imagePath;
+    String originalImagePath;
     int count;
     int addtodis;
 
-    public Card(String name, int damage, int heal, int energycard, String type, int GlDM, int EGlDM, String status, String imagePath,int addtodis) {
+    public Card(String name, int damage, int heal, int energycard, String type, int GlDM, int EGlDM, String status, String imagePath, String originalImagePath, int addtodis) {
         this.name = name;
         this.type = type;
         this.damage = damage;
@@ -38,7 +38,12 @@ class Card {
         this.EGlDM = EGlDM;
         this.status = status;
         this.imagePath = imagePath;
+        this.originalImagePath=imagePath;
         this.addtodis=addtodis;//marks ads card on dis and number of add
+
+    }
+    public void resetImagePath() {
+        this.imagePath = this.originalImagePath;
     }
 }
 
@@ -60,20 +65,18 @@ class Player {
 
     private void loadCardsFromJson() {
         Gson gson = new Gson();
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("CardPart/cards.json");
-             InputStreamReader reader = new InputStreamReader(inputStream)){
-            Type listType = new TypeToken<ArrayList<Card>>() {}.getType();
-            List<Card> cards = gson.fromJson(reader, listType);
-            for (Card card : cards) {
-                int count = card.count; // Get the count of the card
-                for (int i = 0; i < count; i++) {
-                    deck.add(card);
-                }
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("CardPart/cards.json");
+        InputStreamReader reader = new InputStreamReader(inputStream);
+        Type listType = new TypeToken<ArrayList<Card>>() {}.getType();
+        List<Card> cards = gson.fromJson(reader, listType);
+        for (Card card : cards) {
+            int count = card.count; // Get the count of the card
+            for (int i = 0; i < count; i++) {
+                deck.add(card);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
+
 
     public void drawCard() {
         if (!deck.isEmpty() && hand.size() < 8) {
@@ -97,10 +100,18 @@ class Player {
             {}// optimization
             else if (card.status.equals("infect")) {
                 Gl.infect = Gl.infect + 3;
-                Gl.Nstatus++;
+                Gl.Nstatus=Gl.Nstatus+3;
             } else if (card.status.equals("insanity")) {
-                Gl.insanity = Gl.insanity + 3;
+                Gl.insanity = Gl.insanity + 1;
                 Gl.Nstatus++;}
+            else if (card.status.equals("clear")) {
+                int Nfixed=0;
+                //if ( Gl.Nstatus > 0){
+                if (Gl.insanity > 0){Gl.insanity = Gl.insanity-1;Nfixed++;}
+                if (Gl.infect > 0){Gl.infect = Gl.infect -1;}Nfixed++;
+                //}
+                Gl.Nstatus=Gl.Nstatus-Nfixed;
+               }
             hand.remove(card);
 
             int i = 0;
@@ -124,6 +135,11 @@ class Player {
 //            deck.add(new Card("Flamethrower", 5, 0, 2, "attack", 0, 0, "", "/CardPart/resources/flamethrower.png"));
 //        }
 //    }
+public void resetCardsImagePath() {
+    for (Card card : hand) {
+        card.resetImagePath();
+    }
+}
 }
 
  class BackgroundPanel extends JPanel {
@@ -257,9 +273,9 @@ public class CardPart extends JFrame implements ActionListener {
         backgroundPanel.add(cardPanel, BorderLayout.SOUTH);
        // backgroundPanel.add(monsterPanel, BorderLayout.EAST);
 
-        MouseTrackerPanel mouseTrackerPanel = new MouseTrackerPanel();
-        mouseTrackerPanel.setPreferredSize(new Dimension((int)(200/Gl.GlDisMod), (int)(200/Gl.GlDisMod)));
-        mouseTrackerPanel.setOpaque(false);
+//        MouseTrackerPanel mouseTrackerPanel = new MouseTrackerPanel();
+//        mouseTrackerPanel.setPreferredSize(new Dimension((int)(200/Gl.GlDisMod), (int)(200/Gl.GlDisMod)));
+//        mouseTrackerPanel.setOpaque(false);
         // Add action panel
         actionPanel = new JPanel(new GridLayout(0, 1)) {
             private Image backgroundImage;
@@ -275,7 +291,7 @@ public class CardPart extends JFrame implements ActionListener {
             }
         };
 
-        actionPanel.add(mouseTrackerPanel);
+        //actionPanel.add(mouseTrackerPanel);
         actionPanel.setVisible(false);
         BackgroundPanel actionPanel2 = new BackgroundPanel("/CardPart/resources/Fon.png");
         // Add pentagram button
@@ -298,7 +314,7 @@ public class CardPart extends JFrame implements ActionListener {
 
         // Use JLayeredPane as the main panel
         JLayeredPane layeredPane = new JLayeredPane();
-        layeredPane.setPreferredSize(new Dimension(Gl.GlDisWid, Gl.GlDisHei));
+        layeredPane.setPreferredSize(new Dimension((int)(1920/Gl.GlDisMod),(int)(1080/Gl.GlDisMod)));
         layeredPane.add(backgroundPanel, JLayeredPane.DEFAULT_LAYER);
        // layeredPane.add(monsterPanelHPIMG, JLayeredPane.PALETTE_LAYER);
         layeredPane.add(actionPanel, JLayeredPane.PALETTE_LAYER);
@@ -307,7 +323,7 @@ public class CardPart extends JFrame implements ActionListener {
         // Set bounds for the panels
         backgroundPanel.setBounds(0, 0, (int)(1920/Gl.GlDisMod),(int)(1080/Gl.GlDisMod));
         actionPanel.setBounds((int)(440/Gl.GlDisMod), (int)(200/Gl.GlDisMod), (int)(700/Gl.GlDisMod), (int)(500/Gl.GlDisMod)); // Adjust the size and position as needed
-        topPanel.setBounds(0, 0, Gl.GlDisWid, (int)(200/Gl.GlDisMod));
+        topPanel.setBounds(0, 0,(int)(1920/Gl.GlDisMod), (int)(200/Gl.GlDisMod));
         monsterPanel.setBounds((int)(1600/Gl.GlDisMod), (int)(400/Gl.GlDisMod), (int)(200/Gl.GlDisMod), (int)(400/Gl.GlDisMod));
        // monsterPanelHPIMG.setBounds((int)(1580/Gl.GlDisMod), (int)(300/Gl.GlDisMod), (int)(200/Gl.GlDisMod), (int)(200/Gl.GlDisMod));
       //  monsterPanelHPIMG.setOpaque(false);
@@ -379,11 +395,16 @@ public class CardPart extends JFrame implements ActionListener {
             player.hp = player.hp - Gl.infect;
             if (Gl.infect > 0) {
                 Gl.infect--;
+                Gl.Nstatus--;
             }
             player.energy = Gl.energyglobal;
 
             if (Gl.insanity > 0) {
                 applyInsanityMechanic();
+                System.out.println(Gl.insanity);
+            }else {
+                player.resetCardsImagePath();
+                System.out.println(Gl.insanity);
             }
             if (monster.hp <= 0) {
                 battlesWon++;
@@ -504,7 +525,7 @@ public class CardPart extends JFrame implements ActionListener {
             } else if (actionType.equals("heal")) {
                 monster.hp += action.getValue(); // heal
             }else if (actionType.equals("shuffle_curse")) {
-                player.deck.add(new Card("shuffle_curse", 0, 0, 2, "shuffle_curse", 0, 0, "", "/CardPart/resources/curse.gif",0));
+                player.deck.add(new Card("shuffle_curse", 0, 0, 2, "shuffle_curse", 0, 0, "", "/CardPart/resources/Curse.png","/CardPart/resources/curse.gif",0));
             }
         }
     }
